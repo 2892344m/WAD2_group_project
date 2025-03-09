@@ -7,9 +7,6 @@ DESCRIPTION_MAX_LENGTH = 250
 #Database for user account
 class UserAccount(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    forename = models.CharField(max_length = STRING_MAX_LENGTH)
-    surname = models.CharField(max_length = STRING_MAX_LENGTH)
-    email_address = models.EmailField(max_length = STRING_MAX_LENGTH)
     seller_account = models.BooleanField()
     balance = models.FloatField()
 

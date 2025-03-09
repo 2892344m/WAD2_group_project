@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+
+<html>
+    <head>
+        <title>
+            Bob's Gadgets -
+            {% block title_block %}
+                All the tools you'll ever need!
+            {% endblock %}
+        </title>
+    </head>
+    <body>
+        <div>
+            {% block body_block %}
+            {% endblock %}
+        </div>
+        <div>
+            {% block sidebar_block %}
+            {% endblock %}
+        </div>
+        <hr />
+        <div>
+            <ul>   
+                <li><a href="{% url 'shop:homepage' %}">Home</a></li>
+                {% if user.is_authenticated %}
+                <li><a href="{% url 'auth_logout' %}?next={% url 'shop:homepage' %}">Logout</a></li>
+                <li><a href="{% url 'auth_password_change' %}">Change Password</a></li>
+                {% else %}
+                <li><a href="{% url 'registration_register' %}">Sign Up</a></li>
+                <li><a href="{% url 'auth_login' %}">Login</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </body>
+</html>
