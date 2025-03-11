@@ -1,37 +1,11 @@
 {% extends 'shop/base.html' %}
-{% load staticfiles %}
+{% load static %}
 
 {% block title_block %}
     Homepage
 {% endblock %}
 
 {% block body_block %}
-<<<<<<< HEAD
-<div>
-    <h2>Most Viewed</h2>
-    <ul>
-    {% for product in most_viewed_products %}
-    <li>
-        <a href="{% url 'shop:view_product' product.slug %}"> {{ product.product_name }}</a>
-    </li>
-    {% endfor %}
-    </ul>
-</div>
-<div>
-    <h2>Recently Added</h2>
-    <ul>
-        {% for product in recently_added_products %}
-        <li>
-            <a href="{% url 'shop:view_product' product.slug %}"> {{ product.product_name }}</a>
-        </li>
-        {% endfor %}
-    </ul>
-</div>
-{% endblock %}
-
-{% block sidebar_block %}
-{% endblock %}
-=======
 <div class="p-5 mb-4 bg-light rounded-3">
     <div class="container-fluid py-5">
         <h1 class="display-5 fw-bold">Welcome to Bob's Gadgets!</h1>
@@ -50,4 +24,3 @@
     </div>
 </div>
 {% endblock %}
->>>>>>> 9c57a60 (Added the bootstrap stuff to all the templates we have so far)
