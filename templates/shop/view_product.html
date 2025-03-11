@@ -6,19 +6,22 @@
 {% endblock %}
 
 {% block body_block %}
-    <h1>{{ product.product_name }}</h1>
+<div class="container">
+    <h1 class="mb-4">{{ product.product_name }}</h1>
 
     {% if product.image_reference %}
-        <img src="{{ product.image_reference.url }}" alt="{{ product.product_name }}">
+        <img src="{{ product.image_reference.url }}" alt="{{ product.product_name }}" class="img-fluid mb-4">
     {% else %}
         <p>No image available</p>
     {% endif %}
+
     <p><strong>Description:</strong> {{ product.description }}</p>
     <p><strong>Price:</strong> ${{ product.price }}</p>
     <p><strong>Quantity:</strong> {{ product.quantity }}</p>
     <p><strong>Seller:</strong> {{ product.seller }}</p>
     <p><strong>Added On:</strong> {{ product.date_added }}</p>
 
-    <h1> Reviews</h1>
+    <h2 class="mt-5">Reviews</h2>
+    <!-- Reviews can be rendered here using Bootstrap components -->
+</div>
 {% endblock %}
-

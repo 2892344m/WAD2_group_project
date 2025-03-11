@@ -5,10 +5,14 @@
 {% endblock %}
 
 {% block body_block %}
-    <h1>Register Here</h1>
-    <form method="post" action=".">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <input type="submit" value="Register" />
-    </form>
+<div class="row">
+    <div class="col-md-6 offset-md-3">
+        <h1 class="mb-4">Register Here</h1>
+        <form method="post" action="." class="needs-validation" novalidate>
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">Register</button>
+        </form>
+    </div>
+</div>
 {% endblock %}
