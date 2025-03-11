@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from datetime import date
 
 STRING_MAX_LENGTH = 128
 DESCRIPTION_MAX_LENGTH = 250
@@ -27,11 +28,11 @@ class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     product_name = models.CharField(max_length=STRING_MAX_LENGTH)
     price = models.FloatField()
-    quantity = models.IntegerField()
-    average_rating = models.IntegerField()
+    quantity = models.IntegerField(default=0)
+    average_rating = models.IntegerField(default=-1)
     image_reference = models.ImageField()
     views = models.IntegerField(default=0)
-    date_added = models.DateField()
+    date_added = models.DateField(default=date.today)
     description = models.CharField(max_length=DESCRIPTION_MAX_LENGTH)
 
     def __str__(self):
