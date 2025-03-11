@@ -1,0 +1,13 @@
+{% extends 'shop/base.html' %}
+
+{% block title_block %}
+    Search
+{% endblock %}
+
+{% block body_block %}
+    <ul>
+        {% for product in products %}
+        <a href="{% url 'shop:view_product' product.slug %}"> {{ product.product_name }}</a>
+        {% endfor %}
+    </ul>
+{% endblock %}

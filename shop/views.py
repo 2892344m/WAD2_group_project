@@ -11,7 +11,7 @@ def homepage(request):
     context_dict = {}
     context_dict['most_viewed_products'] = Product.objects.order_by('-views')
     context_dict['recently_added_products'] = Product.objects.order_by('-date_added')
-    context_dict['category_list'] = Category.objects
+    context_dict['category_list'] = Category.objects.order_by()
 
     return render(request, 'shop/homepage.html', context=context_dict)
 
@@ -32,6 +32,14 @@ def view_product(request, product_name_slug):
 
     return render(request, 'shop/view_product.html', context=context_dict)
 
+#Right now it just displays all products
+#Once search and categories are implemented, it will filter displayed products based off parameters
+def search(request):
+    context_dict = {}
+
+    context_dict['products'] = Product.objects.order_by()
+
+    return render(request, 'shop/search.html', context=context_dict)
 
 #This allows a seller to add a product to the shop
 @login_required
