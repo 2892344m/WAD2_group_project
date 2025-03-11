@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.template.defaultfilters import slugify
 from datetime import date
 
 STRING_MAX_LENGTH = 128
@@ -16,7 +17,15 @@ class UserAccount(models.Model):
 
 #Database for different product categories
 class Category(models.Model):
-    name = models.CharField(max_length=STRING_MAX_LENGTH)
+    name = models.CharField(max_length=STRING_MAX_LENGTH, unique=True)
+    slug = models.SlugField(unique=True)
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name)
+        super(Category, self).save(*args, **kwargs)
+
+    class Meta:
+        verbose_name_plural = 'categories'
 
     def __str__(self):
         return self.name
@@ -34,6 +43,11 @@ class Product(models.Model):
     views = models.IntegerField(default=0)
     date_added = models.DateField(default=date.today)
     description = models.CharField(max_length=DESCRIPTION_MAX_LENGTH)
+    slug = models.SlugField(unique=True)
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name)
+        super(Product, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.product_name

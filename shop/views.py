@@ -10,17 +10,20 @@ def homepage(request):
 
 #This collects information on a requested product to be displayed for the user
 #The URL is in the form: http://127.0.0.1:8000/shop/view_product/<Product_ID>/
-def view_product(request, product_ID):
+def view_product(request, product_name_slug):
+
+    context_dict = {}
 
     try:
-        product = Product.objects.get(product_ID=int(product_ID))
+        product = Product.objects.get(slug=product_name_slug)
+        context_dict['product'] = product
     except Product.DoesNotExist:
-        product = None
+        product = None  
 
     if product is None:
         return redirect('/shop/')
 
-    return render(request, 'shop/view_product.html', {'product': product})
+    return render(request, 'shop/view_product.html', context=context_dict)
 
 
 #This allows a seller to add a product to the shop
