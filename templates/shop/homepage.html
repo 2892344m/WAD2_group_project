@@ -1,5 +1,5 @@
 {% extends 'shop/base.html' %}
-{% load static %}
+{% load staticfiles %}
 
 {% block title_block %}
     Homepage
@@ -10,6 +10,16 @@
     <div class="container-fluid py-5">
         <h1 class="display-5 fw-bold">Welcome to Bob's Gadgets!</h1>
         <p class="col-md-8 fs-4">All the tools you'll ever need, now in one place.</p>
+    </div>
+</div>
+
+<div class = "row">
+    <div class="cold-md-8">
+        <form id="search_form" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
     </div>
 </div>
 

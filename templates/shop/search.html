@@ -10,4 +10,14 @@
         <a href="{% url 'shop:view_product' product.slug %}"> {{ product.product_name }}</a>
         {% endfor %}
     </ul>
+
+    <div class = "row">
+        <div class="cold-md-8">
+            <form id="search_form" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+    </div>
 {% endblock %}

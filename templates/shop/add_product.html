@@ -8,7 +8,7 @@
 <div class="row">
     <div class="col-md-8 offset-md-2">
         <h1>Add a New Product</h1>
-        <form id="product_form" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+        <form role="form" id="search_form" method="post" action=".">
             {% csrf_token %}
             {{ form.as_p }}
             <button type="submit" class="btn btn-primary">Submit</button>

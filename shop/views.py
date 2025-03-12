@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 
 from shop.models import Product, Category
-from shop.forms import ProductForm
+from shop.forms import ProductForm, SearchForm
 
 #Collects the Top 5 most viewed and most recently added pages, then sends them to the homepage to display
 #Also sends a list of all categories
@@ -36,6 +36,24 @@ def view_product(request, product_name_slug):
 #Once search and categories are implemented, it will filter displayed products based off parameters
 def search(request):
     context_dict = {}
+
+    if request.method == 'POST':
+        form = SearchForm(request.POST)
+        if form.is_valid():
+            #Takes in a search query from the user
+            #Compares the set of characters in the search with the set of characters of the product, if less then appends to the filtered product list
+            #Finally, return the new product list to be displayed on the page (Not implemented yet)
+            search_query = form.cleaned_data['search']
+            products = Product.objects.order_by()
+            filtered_products = []
+            for product in products:
+                if set(search_query.lower()) <= set(product.product_name.lower()):
+                    filtered_products.append(product.product_name)
+            return HttpResponse(str(filtered_products))
+    else:
+        form = SearchForm()
+
+    context_dict['form'] = form
 
     context_dict['products'] = Product.objects.order_by()
 
