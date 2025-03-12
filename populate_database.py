@@ -52,7 +52,7 @@ def add_product(tool, c):
                                       average_rating = tool['average_rating'],
                                       image_reference = tool['image_reference'],
                                       views = tool['views'],
-                                    #   date_added = tool['date_added'],
+                                      date_added = tool['date_added'],
                                       description = tool['description'],
                                       )
     
