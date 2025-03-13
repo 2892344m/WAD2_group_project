@@ -36,7 +36,7 @@ class Product(models.Model):
     seller = models.ForeignKey(User, on_delete=models.CASCADE)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     product_name = models.CharField(max_length=STRING_MAX_LENGTH)
-    price = models.FloatField()
+    price = models.FloatField(default=0)
     quantity = models.IntegerField(default=0)
     average_rating = models.IntegerField(default=-1)
     image_reference = models.ImageField()
@@ -55,6 +55,7 @@ class Product(models.Model):
 #Database for reviews
 class Review(models.Model):
     reviewer = models.ForeignKey(User, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
     rating = models.IntegerField()
     comment = models.CharField(max_length=DESCRIPTION_MAX_LENGTH)
 
