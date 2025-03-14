@@ -1,7 +1,9 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404
 
+from shop.models import Wishlist
 from shop.models import Product, Category
 from shop.forms import ProductForm, SearchForm
 
@@ -77,3 +79,21 @@ def add_product(request):
     return render(request, 'shop/add_product.html', {'form': form})
 
 
+@login_required
+def wishlist_detail(request):
+    wishlist, created = Wishlist.objects.get_or_create(wishlist_owner=request.user)
+    return render(request, 'shop/wishlist.html', {'wishlist': wishlist, 'products': wishlist.products.all()})
+
+@login_required
+def add_to_wishlist(request, product_slug):
+    product = get_object_or_404(Product, slug=product_slug)
+    wishlist, created = Wishlist.objects.get_or_create(wishlist_owner=request.user)
+    wishlist.products.add(product)
+    return redirect('shop:wishlist_detail')
+
+@login_required
+def remove_from_wishlist(request, product_slug):
+    product = get_object_or_404(Product, slug=product_slug)
+    wishlist, created = Wishlist.objects.get_or_create(wishlist_owner=request.user)
+    wishlist.products.remove(product)
+    return redirect('shop:wishlist_detail')

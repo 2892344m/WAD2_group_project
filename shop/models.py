@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.template.defaultfilters import slugify
 from datetime import date
 
+
 STRING_MAX_LENGTH = 128
 DESCRIPTION_MAX_LENGTH = 250
 
@@ -65,10 +66,11 @@ class Review(models.Model):
 #Database for wishlist
 class Wishlist(models.Model):
     wishlist_owner = models.ForeignKey(User, on_delete=models.CASCADE)
-    product_ID = [] #Array that stores Product objects
+    products = models.ManyToManyField(Product, blank=True)
 
     def __str__(self):
-        return self.wishlist_owner + "'s wishlist"
+        return f"{self.wishlist_owner.username}'s wishlist"
+
 
 #Database for basket
 class Basket(models.Model):
@@ -78,3 +80,4 @@ class Basket(models.Model):
 
     def __str__(self):
         return self.basket_owner + "'s basket"
+    

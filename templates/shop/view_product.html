@@ -21,6 +21,10 @@
     <p><strong>Seller:</strong> {{ product.seller }}</p>
     <p><strong>Added On:</strong> {{ product.date_added }}</p>
 
+    {% if user.is_authenticated %}
+        <a href="{% url 'shop:add_to_wishlist' product.slug %}" class="btn btn-primary mt-3">Add to Wishlist</a>
+    {% endif %}
+
     <h2 class="mt-5">Reviews</h2>
     <!-- Reviews can be rendered here using Bootstrap components -->
 </div>
