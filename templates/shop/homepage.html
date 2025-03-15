@@ -6,23 +6,24 @@
 {% endblock %}
 
 {% block body_block %}
-<div class="p-5 mb-4 bg-light rounded-3">
-    <div class="container-fluid py-5">
-        <h1 class="display-5 fw-bold">Welcome to Bob's Gadgets!</h1>
-        <p class="col-md-8 fs-4">All the tools you'll ever need, now in one place.</p>
-    </div>
-</div>
-
-
-
 <div class="row">
     <div class="col-md-8">
-        <h2>Featured Products</h2>
-        <!-- Insert dynamic featured products here -->
+        <h2>Most Viewed</h2>
+        <ul>
+            {% for product in most_viewed_products %}
+            <a href="{% url 'shop:view_product' product.slug %}"> {{ product.product_name }}</a>
+            {% endfor %}
+        </ul>
     </div>
-    <div class="col-md-4">
-        <h3>Latest News</h3>
-        <p>Placeholder text for news updates.</p>
+</div>
+<div class="row">
+    <div class="col-md-8">
+        <h2>Recently Added</h2>
+        <ul>
+            {% for product in recently_added_products %}
+            <a href="{% url 'shop:view_product' product.slug %}"> {{ product.product_name }}</a>
+            {% endfor %}
+        </ul>
     </div>
 </div>
 {% endblock %}
