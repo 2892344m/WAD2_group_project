@@ -51,6 +51,8 @@ def view_category(request, category_name_slug):
 
 #Displays producst based on search input
 def search(request):
+    print(request)
+    print(type(request))
     context_dict = {}
 
     if request.method == 'POST':
@@ -69,7 +71,7 @@ def search(request):
             context_dict['form'] = form
             context_dict['products'] = filtered_products
 
-            return render(request, 'shop/searchtml', context=context_dict)
+            return render(request, 'shop/search.html', context=context_dict)
     else:
         form = SearchForm()
 

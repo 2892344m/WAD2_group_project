@@ -14,4 +14,4 @@ class ReviewForm(forms.ModelForm):
         fields = ('rating', 'comment',)
 
 class SearchForm(forms.Form):
-    search = forms.CharField(max_length=128, help_text="Search for products here.")
+    search = forms.CharField(max_length=128, initial="Search for products here.")

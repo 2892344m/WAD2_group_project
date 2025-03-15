@@ -1,5 +1,6 @@
 from django import template
 from shop.models import Category
+from shop.forms import SearchForm
 
 register = template.Library()
 
