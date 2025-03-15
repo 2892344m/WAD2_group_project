@@ -7,23 +7,41 @@
 
 {% block body_block %}
 <div class="row">
-    <div class="col-md-8">
         <h2>Most Viewed</h2>
         <ul>
-            {% for product in most_viewed_products %}
-            <a href="{% url 'shop:view_product' product.slug %}"> {{ product.product_name }}</a>
-            {% endfor %}
+            <div class ="row">
+                {% for product in most_viewed_products %}
+                <div class="col-md-3 product-box">
+                    <a href="{% url 'shop:view_product' product.slug %}"> 
+                        {% if product.image_reference %}
+                        <img src="{{ product.image_reference.url}}" alt="{{ product.product_name}}"/>
+                        {% else %}
+                            <p>No image available</p>
+                        {% endif %}
+                        {{ product.product_name }}
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
         </ul>
-    </div>
 </div>
 <div class="row">
-    <div class="col-md-8">
         <h2>Recently Added</h2>
         <ul>
-            {% for product in recently_added_products %}
-            <a href="{% url 'shop:view_product' product.slug %}"> {{ product.product_name }}</a>
-            {% endfor %}
+            <div class ="row">
+                {% for product in recently_added_products %}
+                <div class="col-md-3 product-box">
+                    <a href="{% url 'shop:view_product' product.slug %}"> 
+                        {% if product.image_reference %}
+                        <img src="{{ product.image_reference.url}}" alt="{{ product.product_name}}"/>
+                        {% else %}
+                            <p>No image available</p>
+                        {% endif %}
+                        {{ product.product_name }}
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
         </ul>
-    </div>
 </div>
 {% endblock %}
