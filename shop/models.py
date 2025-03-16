@@ -11,7 +11,7 @@ DESCRIPTION_MAX_LENGTH = 250
 class UserAccount(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     seller_account = models.BooleanField()
-    balance = models.FloatField()
+    balance = models.FloatField(default=0)
 
     def __str__(self):
         return self.user.username
@@ -75,9 +75,9 @@ class Wishlist(models.Model):
 #Database for basket
 class Basket(models.Model):
     basket_owner = models.ForeignKey(User, on_delete=models.CASCADE)
-    product_ID = [] #Array that stores Product objects
-    total_price = models.FloatField()
+    products = models.ManyToManyField(Product, blank=True)
+    total_price = models.FloatField(default=0)
 
     def __str__(self):
-        return self.basket_owner + "'s basket"
+        return f"{self.basket_owner.username}'s basket"
     

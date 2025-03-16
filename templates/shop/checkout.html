@@ -1,0 +1,28 @@
+{% extends 'shop/base.html' %}
+
+{% block title_block %}Checkout{% endblock %}
+{% block body_block %}
+<div class="container">
+    <h1 class="mt-4">Checkout</h1>
+    {% if products %}
+    <ul class="list-group">
+        {% for product in products %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            <a href="{% url 'shop:view_product' product.slug %}">{{ product.product_name }}</a>
+            <h3 class="mt-6">£{{ product.price }}</h3>
+            <a href="{% url 'shop:remove_from_basket' product.slug %}" class="btn btn-danger btn-sm">Remove</a>
+        </li>
+        {% endfor %}
+        <h2 class="mt-5"> Total: £{{ basket.total_price }} </h2>
+        {% if valid %}
+            <a href="{% url 'shop:purchase_confirm' %}" class="btn btn-primary mt-3">Confirm Purchase</a>
+        {% else %}
+            <h2 class="mt-5"> Your Balance is insufficient </h2>
+            <a href="{% url 'shop:edit_balance' %}" class="btn btn-primary mt-3">Edit Balance</a>
+        {% endif %}
+    </ul>
+    {% else %}
+    <p>Your Basket is empty.</p>
+    {% endif %}
+</div>
+{% endblock %}

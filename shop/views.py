@@ -3,9 +3,9 @@ from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 
-from shop.models import Wishlist
+from shop.models import Wishlist, Basket, UserAccount
 from shop.models import Product, Category
-from shop.forms import ProductForm, SearchForm
+from shop.forms import ProductForm, SearchForm, BalanceForm
 
 #Collects the Top 5 most viewed and most recently added pages, then sends them to the homepage to display
 #Also sends a list of all categories
@@ -14,6 +14,9 @@ def homepage(request):
     context_dict['most_viewed_products'] = Product.objects.order_by('-views')[:4]
     context_dict['recently_added_products'] = Product.objects.order_by('-date_added')[:4]
     context_dict['category_list'] = Category.objects.order_by()
+
+    userAccount, created = UserAccount.objects.get_or_create(user=request.user)
+    context_dict['user_balance'] = userAccount.balance
 
     return render(request, 'shop/homepage.html', context=context_dict)
 
@@ -116,3 +119,104 @@ def remove_from_wishlist(request, product_slug):
     wishlist, created = Wishlist.objects.get_or_create(wishlist_owner=request.user)
     wishlist.products.remove(product)
     return redirect('shop:wishlist_detail')
+
+@login_required
+def basket_detail(request):
+    basket, created = Basket.objects.get_or_create(basket_owner=request.user)
+
+    total = 0
+
+    for productInBasket in (basket.products).all():
+        total = total + productInBasket.price
+
+    basket.total_price = total
+    basket.save()
+
+    return render(request, 'shop/basket.html', {'basket': basket, 'products': basket.products.all()})
+
+@login_required
+def add_to_basket(request, product_slug):
+    product = get_object_or_404(Product, slug=product_slug)
+    basket, created = Basket.objects.get_or_create(basket_owner=request.user)
+
+    basket.products.add(product)
+    basket.total_price = basket.total_price + product.price
+    basket.save()
+
+    return redirect('shop:basket_detail')
+
+@login_required
+def remove_from_basket(request, product_slug):
+    product = get_object_or_404(Product, slug=product_slug)
+    basket, created = Basket.objects.get_or_create(basket_owner=request.user)
+
+    basket.products.remove(product)
+    basket.total_price = basket.total_price - product.price
+    basket.save()
+    
+    return redirect('shop:basket_detail')
+
+@login_required
+def checkout_detail(request):
+    basket, created = Basket.objects.get_or_create(basket_owner=request.user)
+
+    try:
+        userAccount = UserAccount.objects.get(user=request.user)
+    except UserAccount.DoesNotExist:
+        userAccount = None
+
+    total = 0
+
+    for productInBasket in (basket.products).all():
+        total = total + productInBasket.price
+
+    basket.total_price = total
+    basket.save()
+
+    if userAccount.balance >= total:
+        valid = True
+    else:
+        valid = False 
+
+    return render(request, 'shop/checkout.html', {'basket': basket, 'products': basket.products.all(), 'valid': valid})
+
+@login_required
+def purchase_confirm(request):
+
+    context_dict = {}
+
+    try:
+        userAccount = UserAccount.objects.get(user=request.user)
+        context_dict['userAccount'] = userAccount
+    except UserAccount.DoesNotExist:
+        userAccount = None
+
+
+    basket, created = Basket.objects.get_or_create(basket_owner=request.user)
+
+
+    userAccount.balance = userAccount.balance - basket.total_price
+    userAccount.save()
+
+    basket.products.clear()
+    basket.total_price = 0
+    basket.save()
+
+    return render(request, 'shop/purchase_confirm.html', context=context_dict)    
+
+@login_required
+def edit_balance(request):
+
+    try:
+        userAccount = UserAccount.objects.get(user=request.user)
+    except UserAccount.DoesNotExist:
+        userAccount = None
+
+    if request.method == 'POST':
+        form = BalanceForm(request.POST, instance=userAccount)
+        if form.is_valid():
+            form.save()
+            return redirect('/shop/')
+    else:
+        form = BalanceForm(instance=userAccount)
+    return render(request, 'shop/edit_balance.html', {'form': form})

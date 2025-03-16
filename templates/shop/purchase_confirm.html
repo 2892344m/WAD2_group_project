@@ -1,0 +1,15 @@
+{% extends 'shop/base.html' %}
+{% load staticfiles %}
+
+{% block title_block %}
+    Purchase Confirmation
+{% endblock %}
+
+{% block body_block %}
+<div class="container">
+    <h1 class="mb-4">Purchase Confirmation</h1>
+    <h2 class="mt-5">Thank you for your purchase.</h2>
+    <a href="{% url 'shop:homepage' %}" class="btn btn-primary mt-3">Back To Home</a>
+
+</div>
+{% endblock %}
