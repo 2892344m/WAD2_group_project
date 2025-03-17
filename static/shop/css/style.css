@@ -16,3 +16,17 @@
     color: black;
     font-weight:bold;
 }
+.container-fluid {
+    min-height: 100vh; 
+    display: flex;
+    flex-direction: column;
+}
+.row {
+    flex: 1; 
+}
+main {
+    padding: 20px; 
+}
+.sidebar {
+    background-color: white; 
+}

@@ -8,14 +8,15 @@
     <title>Bob's Gadgets - {% block title_block %}All the tools you'll ever need!{% endblock %}</title>
     
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link href="https://getbootstrap.com/docs/4.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{% static 'shop/css/style.css' %}">
 </head>
 <body>
+  <header>
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <div class="container-fluid">
+      <div class="container">
         <a class="navbar-brand" href="{% url 'shop:homepage' %}">Bob's Gadgets</a>
         <!-- Search form - Redirects to search.html -->
         <form method = "POST" action="{% url 'shop:search' %}">
@@ -28,11 +29,14 @@
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarContent">
-          <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+          <ul class="navbar-nav ml-auto mb-2 mb-lg-0">
             <li class="nav-item"><a class="nav-link" href="{% url 'shop:homepage' %}">Home</a></li>
             {% if user.is_authenticated %}
                 <li class="nav-item"><a class="nav-link" href="{% url 'auth_logout' %}?next={% url 'shop:homepage' %}">Logout</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'shop:add_product' %}">Add Product</a></li>
                 <li class="nav-item"><a class="nav-link" href="{% url 'auth_password_change' %}">Change Password</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'shop:edit_balance' %}">Edit Balance</a></li>
+                <li class="nav-item"><p class="nav-link"> £{{ user_balance }}</p></li>
             {% else %}
                 <li class="nav-item"><a class="nav-link" href="{% url 'registration_register' %}">Sign Up</a></li>
                 <li class="nav-item"><a class="nav-link" href="{% url 'auth_login' %}">Login</a></li>
@@ -41,7 +45,7 @@
         </div>
       </div>
     </nav>
-
+  </header>
     <!-- Main content -->
 
     <div class="container-fluid">
@@ -54,11 +58,11 @@
               </div>
           </nav>
           
-          <main role="main" class="col-md-9  ml-sm-auto col-lg-10 px-4">		
+           <main role="main" class="col-md-9  ml-sm-auto col-lg-10 px-4">
             {% block body_block %}{% endblock %}
               
             <!-- FOOTER -->
-            <footer class="container text-center">
+            <footer>
               <p>&copy; Bob's Gadgets {% now "Y" %}</p>
             </footer>
           </main>
@@ -66,6 +70,9 @@
     </div>
   
     <!-- Bootstrap JS Bundle -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script>window.jQuery || document.write('<script src="https://getbootstrap.com/docs/4.2/assets/js/vendor/jquery-slim.min.js"><\/script>')</script><script src="https://getbootstrap.com/docs/4.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-zDnhMsjVZfS3hiP7oCBRmfjkQC4fzxVxFhBx8Hkz2aZX8gEvA/jsP3eXRCvzTofP" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.9.0/feather.min.js"></script>
+    <script src="https://getbootstrap.com/docs/4.2/examples/dashboard/dashboard.js"></script>
 </body>
 </html>
