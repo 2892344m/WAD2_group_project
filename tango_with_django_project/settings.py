@@ -137,3 +137,6 @@ REGISTRATION_OPEN = True
 REGISTRATION_AUTO_LOGIN = True
 LOGIN_REDIRECT_URL = 'shop:homepage'
 LOGIN_URL = 'auth_login'
+
+# Fix for AutoField Warning
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
