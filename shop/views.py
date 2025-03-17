@@ -15,8 +15,9 @@ def homepage(request):
     context_dict['recently_added_products'] = Product.objects.order_by('-date_added')[:4]
     context_dict['category_list'] = Category.objects.order_by()
 
-    userAccount, created = UserAccount.objects.get_or_create(user=request.user)
-    context_dict['user_balance'] = userAccount.balance
+    if request.user.is_authenticated:
+        userAccount, created = UserAccount.objects.get_or_create(user=request.user)
+        context_dict['user_balance'] = userAccount.balance
 
     return render(request, 'shop/homepage.html', context=context_dict)
 
