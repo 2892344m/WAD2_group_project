@@ -31,12 +31,11 @@
         <div class="collapse navbar-collapse" id="navbarContent">
           <ul class="navbar-nav ml-auto mb-2 mb-lg-0">
             <li class="nav-item"><a class="nav-link" href="{% url 'shop:homepage' %}">Home</a></li>
-            {% if user.is_authenticated %}
-                <li class="nav-item"><a class="nav-link" href="{% url 'auth_logout' %}?next={% url 'shop:homepage' %}">Logout</a></li>
+            {% if user.is_authenticated %}           
                 <li class="nav-item"><a class="nav-link" href="{% url 'shop:add_product' %}">Add Product</a></li>
                 <li class="nav-item"><a class="nav-link" href="{% url 'auth_password_change' %}">Change Password</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'shop:edit_balance' %}">Edit Balance</a></li>
                 <li class="nav-item"><p class="nav-link"> £{{ user_balance }}</p></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'auth_logout' %}?next={% url 'shop:homepage' %}">Logout</a></li>
             {% else %}
                 <li class="nav-item"><a class="nav-link" href="{% url 'registration_register' %}">Sign Up</a></li>
                 <li class="nav-item"><a class="nav-link" href="{% url 'auth_login' %}">Login</a></li>
@@ -62,8 +61,10 @@
             {% block body_block %}{% endblock %}
               
             <!-- FOOTER -->
-            <footer>
-              <p>&copy; Bob's Gadgets {% now "Y" %}</p>
+            <footer class="mt-4 py-3 bg-light">
+              <div class="container text-center">
+                <p>&copy; Bob's Gadgets {% now "Y" %}</p>
+              </div>
             </footer>
           </main>
       </div>
