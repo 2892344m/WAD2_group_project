@@ -35,9 +35,7 @@
                 <li class="nav-item"><a class="nav-link" href="{% url 'shop:add_product' %}">Add Product</a></li>
                 <li class="nav-item"><a class="nav-link" href="{% url 'auth_password_change' %}">Change Password</a></li>
                 <li class="nav-item"><p class="nav-link"> £{{ user_balance }}</p></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'auth_logout' %}?next={% url 'shop:homepage' %}">Logout</a></li>
             {% else %}
-                <li class="nav-item"><a class="nav-link" href="{% url 'registration_register' %}">Sign Up</a></li>
                 <li class="nav-item"><a class="nav-link" href="{% url 'auth_login' %}">Login</a></li>
             {% endif %}
           </ul>
@@ -51,10 +49,39 @@
       <div class="row">
           <nav class="col-md-2 d-none d-md-block bg-light sidebar">
               <div class="sidebar-sticky">
-              {% block sidebar_block %}
+                {% block sidebar_block %}
+                <h3>Categories</h3>
+                <div>
                   {% get_category_list category %}
-              {% endblock %}
+                </div>
+             
+                <div>
+                  <h3>Account</h3>
+                  <ul class="nav flex-column">
+                    {% if user.is_authenticated %}
+                    <li class="nav-item">
+                      <a class="nav-link" href="{% url 'auth_logout' %}">
+                          <span data-feather="archive"></span>Logout</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="{% url 'shop:wishlist_detail' %}">
+                        <span data-feather="archive"></span>Wishlist</a>
+                      </a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="{% url 'shop:basket_detail' %}">
+                        <span data-feather="archive"></span>Basket</a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                      <a class="nav-link" href="{% url 'registration_register' %}">
+                          <span data-feather="archive"></span>Register</a>
+                    </li>
+                    {% endif %}
+                  </ul>
+                </div>    
               </div>
+              {% endblock %}
           </nav>
           
            <main role="main" class="col-md-9  ml-sm-auto col-lg-10 px-4">

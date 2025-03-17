@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title_block %}
+    Account
+{% endblock %}
+
+{% block body_block %}
+<div>
+    {% if userAccount.account_img %}
+        <img src="userAccount.account_img" alt="{{ user.username }}'s account image" class="img-fluid mb-4">
+    {% endif %}
+    <ul class="nav flex-column">
+        <li>{{ user.username }}</li>
+        <li>{{ user.firstname }}</li>
+        <li>{{ user.surname }}</li>
+    </ul>
+</div>
+{% endblock %}

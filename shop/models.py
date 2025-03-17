@@ -11,6 +11,7 @@ DESCRIPTION_MAX_LENGTH = 250
 class UserAccount(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     seller_account = models.BooleanField()
+    account_img = models.ImageField(required=False)
     balance = models.FloatField(default=0)
 
     def __str__(self):
