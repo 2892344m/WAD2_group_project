@@ -1,14 +1,13 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404
+from shop.models import Wishlist, Basket, UserAccount, Product, Category
+from shop.forms import ProductForm, SearchForm, BalanceForm, ReviewForm
 
-from shop.models import Wishlist, Basket, UserAccount
-from shop.models import Product, Category
-from shop.forms import ProductForm, SearchForm, BalanceForm
+from datetime import date
 
-#Collects the Top 5 most viewed and most recently added pages, then sends them to the homepage to display
-#Also sends a list of all categories
+# Collects the Top 5 most viewed and most recently added pages, then sends them to the homepage to display
+# Also sends a list of all categories
 def homepage(request):
     context_dict = {}
     context_dict['most_viewed_products'] = Product.objects.order_by('-views')[:4]
@@ -21,10 +20,9 @@ def homepage(request):
 
     return render(request, 'shop/homepage.html', context=context_dict)
 
-#This collects information on a requested product to be displayed for the user
-#The URL is in the form: http://127.0.0.1:8000/shop/view_product/<product_name_slug>/
+# This collects information on a requested product to be displayed for the user
+# The URL is in the form: http://127.0.0.1:8000/shop/view_product/<product_name_slug>/
 def view_product(request, product_name_slug):
-
     context_dict = {}
 
     try:
@@ -38,7 +36,7 @@ def view_product(request, product_name_slug):
 
     return render(request, 'shop/view_product.html', context=context_dict)
 
-#Displays all products present within a category
+# Displays all products present within a category
 def view_category(request, category_name_slug):
     context_dict = {}
 
@@ -53,7 +51,7 @@ def view_category(request, category_name_slug):
 
     return render(request, 'shop/category.html', context=context_dict)
 
-#Displays producst based on search input
+# Displays products based on search input
 def search(request):
     print(request)
     print(type(request))
@@ -62,9 +60,10 @@ def search(request):
     if request.method == 'POST':
         form = SearchForm(request.POST)
         if form.is_valid():
-            #Takes in a search query from the user
-            #Compares the set of characters in the search with the set of characters of the product, if less then appends to the filtered product list
-            #Finally, return the new product list to be displayed on the page
+            # Takes in a search query from the user
+            # Compares the set of characters in the search with the set of characters of the product, 
+            # if less then appends to the filtered product list
+            # Finally, return the new product list to be displayed on the page
             search_query = form.cleaned_data['search']
             products = Product.objects.order_by()
             filtered_products = []
@@ -84,14 +83,12 @@ def search(request):
 
     return render(request, 'shop/search.html', context=context_dict)
 
-#This allows a seller to add a product to the shop
+# This allows a seller to add a product to the shop
 @login_required
 def add_product(request):
-
     if request.method == 'POST':
         form = ProductForm(request.POST, request.FILES)
         if form.is_valid():
-
             product = form.save(commit=False)
             product.quantity = product.quantity + 1
             product.seller = request.user
@@ -100,7 +97,6 @@ def add_product(request):
     else:
         form = ProductForm()
     return render(request, 'shop/add_product.html', {'form': form})
-
 
 @login_required
 def wishlist_detail(request):
@@ -126,9 +122,8 @@ def basket_detail(request):
     basket, created = Basket.objects.get_or_create(basket_owner=request.user)
 
     total = 0
-
-    for productInBasket in (basket.products).all():
-        total = total + productInBasket.price
+    for productInBasket in basket.products.all():
+        total += productInBasket.price
 
     basket.total_price = total
     basket.save()
@@ -139,9 +134,8 @@ def basket_detail(request):
 def add_to_basket(request, product_slug):
     product = get_object_or_404(Product, slug=product_slug)
     basket, created = Basket.objects.get_or_create(basket_owner=request.user)
-
     basket.products.add(product)
-    basket.total_price = basket.total_price + product.price
+    basket.total_price += product.price
     basket.save()
 
     return redirect('shop:basket_detail')
@@ -150,9 +144,8 @@ def add_to_basket(request, product_slug):
 def remove_from_basket(request, product_slug):
     product = get_object_or_404(Product, slug=product_slug)
     basket, created = Basket.objects.get_or_create(basket_owner=request.user)
-
     basket.products.remove(product)
-    basket.total_price = basket.total_price - product.price
+    basket.total_price -= product.price
     basket.save()
     
     return redirect('shop:basket_detail')
@@ -167,37 +160,29 @@ def checkout_detail(request):
         userAccount = None
 
     total = 0
-
-    for productInBasket in (basket.products).all():
-        total = total + productInBasket.price
+    for productInBasket in basket.products.all():
+        total += productInBasket.price
 
     basket.total_price = total
     basket.save()
 
-    if userAccount.balance >= total:
-        valid = True
-    else:
-        valid = False 
+    valid = userAccount.balance >= total if userAccount else False
 
     return render(request, 'shop/checkout.html', {'basket': basket, 'products': basket.products.all(), 'valid': valid})
 
 @login_required
 def purchase_confirm(request):
-
     context_dict = {}
-
     try:
         userAccount = UserAccount.objects.get(user=request.user)
         context_dict['userAccount'] = userAccount
     except UserAccount.DoesNotExist:
         userAccount = None
 
-
     basket, created = Basket.objects.get_or_create(basket_owner=request.user)
-
-
-    userAccount.balance = userAccount.balance - basket.total_price
-    userAccount.save()
+    if userAccount:
+        userAccount.balance -= basket.total_price
+        userAccount.save()
 
     basket.products.clear()
     basket.total_price = 0
@@ -207,7 +192,6 @@ def purchase_confirm(request):
 
 @login_required
 def edit_balance(request):
-
     try:
         userAccount = UserAccount.objects.get(user=request.user)
     except UserAccount.DoesNotExist:
@@ -221,3 +205,27 @@ def edit_balance(request):
     else:
         form = BalanceForm(instance=userAccount)
     return render(request, 'shop/edit_balance.html', {'form': form})
+
+# NEW VIEW: Handles adding a rating/review for a product
+@login_required
+def add_rating(request, product_slug):
+    # Retrieve the product by slug
+    product = get_object_or_404(Product, slug=product_slug)
+    
+    if request.method == "POST":
+        form = ReviewForm(request.POST)
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.product = product         # Link the review to the product
+            review.reviewer = request.user   # Set the reviewer to the current user
+            review.save()
+            # Redirect to the product detail page after saving
+            return redirect('shop:view_product', product_name_slug=product.slug)
+    else:
+        form = ReviewForm()
+    
+    context = {
+        'form': form,
+        'product': product,
+    }
+    return render(request, 'shop/add_rating.html', context)
