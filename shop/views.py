@@ -1,7 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.decorators import login_required
-from shop.models import Wishlist, Basket, UserAccount, Product, Category
+from django.views import View
+
+from shop.models import Wishlist, Basket, UserAccount, Product, Category, User
 from shop.forms import ProductForm, SearchForm, BalanceForm, ReviewForm
 
 from datetime import date
@@ -229,3 +231,39 @@ def add_rating(request, product_slug):
         'product': product,
     }
     return render(request, 'shop/add_rating.html', context)
+
+# Allows user to view details of account
+@login_required
+def view_account(request):
+    context_dict = {}
+    context_dict['user'] = request.user
+    context_dict['userAccount'] = UserAccount.objects.get(user=request.user)
+
+    print(context_dict['user'])
+    print(context_dict['userAccount'].account_img)
+
+    return render(request, 'shop/account.html', context_dict)
+
+#Allows user to change first name and last name
+class ChangeUserName(View):
+    @login_required
+    def get(self, request):
+        print("Beginning request")
+        username = request.GET['userId']
+        fname = request.GET['fname']
+        sname = request.GET['sname']
+
+        try:
+            user = User.objects.get(username=username)
+  
+        except User.DoesNotExist:
+            return HttpResponse(-1)
+        except ValueError:
+            return HttpResponse(-1)
+        
+        user.first_name = fname
+        user.last_name = sname
+        user.save()
+
+        return HttpResponse()
+

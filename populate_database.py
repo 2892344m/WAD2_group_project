@@ -253,9 +253,11 @@ def add_user(user):
     return u
 
 def add_user_account(user, user_account):
+    USER_PLACEHOLDER_IMG = 'default.svg'
     u = UserAccount.objects.get_or_create(user=user, 
                                           seller_account=user_account['seller_account'],
-                                          balance=user_account['balance'])
+                                          balance=user_account['balance'],
+                                          account_img = USER_PLACEHOLDER_IMG)
 
 if __name__ == "__main__":
     print("Starting Rango Population script...")
