@@ -23,5 +23,5 @@ urlpatterns = [
     path('edit_balance/', views.edit_balance, name='edit_balance'),
     path('add_rating/<slug:product_slug>/', views.add_rating, name='add_rating'),
     path('account/', views.view_account, name='view_account'),
-    path('change_name/', views.ChangeUserName.as_view(), name="change_name"),
+    path('change_name/', views.change_user_name, name="change_name"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, JsonResponse
+from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.decorators import login_required
 from django.views import View
 
@@ -7,6 +8,8 @@ from shop.models import Wishlist, Basket, UserAccount, Product, Category, User
 from shop.forms import ProductForm, SearchForm, BalanceForm, ReviewForm
 
 from datetime import date
+
+import json
 
 # Collects the Top 5 most viewed and most recently added pages, then sends them to the homepage to display
 # Also sends a list of all categories
@@ -255,15 +258,34 @@ class ChangeUserName(View):
 
         try:
             user = User.objects.get(username=username)
-  
         except User.DoesNotExist:
-            return HttpResponse(-1)
+            return HttpResponse()
         except ValueError:
-            return HttpResponse(-1)
+            return HttpResponse()
         
         user.first_name = fname
         user.last_name = sname
         user.save()
 
         return HttpResponse()
+    
+#Ajax style implementation test
+@csrf_protect
+def change_user_name(request):
+    if request.method == "POST":
+        user_id = request.POST.get('id')
+        forename = request.POST.get('fname')
+        surname = request.POST.get('sname')
+        try:
+            user = User.objects.get(id=user_id)
+            user.first_name = forename
+            user.last_name = surname
+            user.save()
+            return JsonResponse({'success': True})
+        except json.JSONDecodeError or user.DoesNotExist:
+            return JsonResponse({'success':False}, status=400)
+
+    return JsonResponse({'success': False}, status=400)
+
+
 
