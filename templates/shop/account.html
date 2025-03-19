@@ -1,4 +1,5 @@
 {% extends 'shop/base.html' %}
+{% load staticfiles %}
 
 {% block title_block %}
     Account
@@ -17,11 +18,11 @@
 </div>
 <div>
     <ul class="nav flex-column">
-        <li><button id="change_name" 
-            data-userid="{{ user.id }}"
-            class="btn btn-primary btn-sm" 
-            type="button"><span data-feather="feather"></span>
-        Change Name</button></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'shop:change_name' %}">Change Name</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'shop:change_username' %}">Change Username</a></li>
+        {% if userAccount.seller_account == False %}
+        <li class="nav-item"><a class="nav-link" href="{% url 'shop:become_seller' %}">Become a seller</a></li>
+        {% endif %}
     </ul> 
 </div>
 {% endblock %}

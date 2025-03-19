@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.views import View
 
 from shop.models import Wishlist, Basket, UserAccount, Product, Category, User
-from shop.forms import ProductForm, SearchForm, BalanceForm, ReviewForm
+from shop.forms import ProductForm, SearchForm, BalanceForm, ReviewForm, ChangeUserFullnameForm, ChangeUsernameForm, BecomeASellerForm
 
 from datetime import date
 
@@ -268,24 +268,6 @@ class ChangeUserName(View):
         user.save()
 
         return HttpResponse()
-    
-#Ajax style implementation test
-@csrf_protect
-def change_user_name(request):
-    if request.method == "POST":
-        user_id = request.POST.get('id')
-        forename = request.POST.get('fname')
-        surname = request.POST.get('sname')
-        try:
-            user = User.objects.get(id=user_id)
-            user.first_name = forename
-            user.last_name = surname
-            user.save()
-            return JsonResponse({'success': True})
-        except json.JSONDecodeError or user.DoesNotExist:
-            return JsonResponse({'success':False}, status=400)
-
-    return JsonResponse({'success': False}, status=400)
 
 #Increments views attribute of the product model
 @csrf_protect
@@ -301,3 +283,62 @@ def add_views(request):
             return JsonResponse({'success': False})
     return JsonResponse({'success': False})
 
+#Change User objects first name and last name
+@login_required
+def user_change_full_name(request):
+    context_dict = {}
+
+    if request.method == "POST":
+        form = ChangeUserFullnameForm(request.POST)
+        if form.is_valid():
+            user = User.objects.get(id=request.user.id)
+            user.first_name = form.cleaned_data['first_name']
+            user.last_name = form.cleaned_data['last_name']
+            user.save()
+            return redirect('shop:view_account')
+    else:
+        form = ChangeUserFullnameForm()
+    
+    context_dict['form'] = form
+    context_dict['change'] = "Change Full Name"
+
+    return render(request, 'shop/change_account_info.html', context=context_dict)
+
+@login_required
+def user_change_username(request):
+    context_dict = {}
+
+    if request.method == "POST":
+        form = ChangeUsernameForm(request.POST)
+        if form.is_valid():
+            user = User.objects.get(id=request.user.id)
+            user.username = form.cleaned_data["username"]
+            user.save()
+            return redirect('shop:view_account')
+    else:
+        form = ChangeUsernameForm()
+
+    context_dict['form'] = form
+    context_dict['change'] = "Change Username"
+    
+    return render(request, 'shop/change_account_info.html', context=context_dict)
+
+@login_required
+def become_a_seller(request):
+    context_dict ={}
+
+    if request.method == "POST":
+        form = BecomeASellerForm(request.POST)
+        if form.is_valid():
+            user = UserAccount.objects.get(user=request.user)
+            user.seller_account = True
+            user.save()
+            return redirect('shop:view_account')
+    else:
+        form = BecomeASellerForm(request.POST)
+    
+    context_dict['form'] = form
+    context_dict['change'] = "Become a Seller"
+    context_dict['message'] = "Clicking this button will make you a seller, allowing you to sell products on our site. This is a quick warning that we take 92 percent of profits from transactions. To proceed please click the submit button."
+
+    return render(request, 'shop/change_account_info.html', context=context_dict)
