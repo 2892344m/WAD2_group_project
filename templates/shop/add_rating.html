@@ -1,6 +1,11 @@
-{% extends "shop/base.html" %}
+{% extends 'shop/base.html' %}
+{% load staticfiles %}
 
-{% block content %}
+{%block title_block %}
+  Add Reviews
+{% endblock %}
+
+{% block body_block %}
   <div class="container">
     <h2>Add Rating for "{{ product.product_name }}"</h2>
     <form method="post">

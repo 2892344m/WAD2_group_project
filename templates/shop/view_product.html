@@ -1,5 +1,5 @@
 {% extends 'shop/base.html' %}
-{% load static %}
+{% load staticfiles %}
 
 {% block title_block %}
     {{ product.product_name }}
@@ -16,6 +16,7 @@
     {% endif %}
 
     <p><strong>Description:</strong> {{ product.description }}</p>
+    <p><strong>Rating: </strong> {{ product.average_rating }}</p>
     <p><strong>Price:</strong> ${{ product.price }}</p>
     <p><strong>Quantity:</strong> {{ product.quantity }}</p>
     <p><strong>Seller:</strong> {{ product.seller }}</p>
@@ -24,9 +25,17 @@
     {% if user.is_authenticated %}
         <a href="{% url 'shop:add_to_wishlist' product.slug %}" class="btn btn-primary mt-3">Add to Wishlist</a>
         <a href="{% url 'shop:add_to_basket' product.slug %}" class="btn btn-primary mt-3">Add to Basket</a>
+        <a href="{% url 'shop:add_rating' product.slug %}" class="btn btn-primary mt-3">Add Rating</a>
     {% endif %}
-
-    <h2 class="mt-5">Reviews</h2>
-    <!-- Reviews can be rendered here using Bootstrap components -->
+</div>
+<div class="container" id="reviews">
+    <h2>Reviews</h2>
+    {% for r in reviews %}
+        <div class="review-box">
+            <h3>{{ r.reviewer.username }}</h3>
+            <p>{{ r.rating }}</p>
+            <p>{{ r.comment }}</p>
+        </div>
+    {% endfor %}
 </div>
 {% endblock %}

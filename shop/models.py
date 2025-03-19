@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.template.defaultfilters import slugify
+from django.core.validators import MaxValueValidator, MinValueValidator
+
 from datetime import date
 
 
@@ -30,7 +32,7 @@ class Product(models.Model):
     product_name = models.CharField(max_length=STRING_MAX_LENGTH)
     price = models.FloatField(default=0)
     quantity = models.IntegerField(default=0)
-    average_rating = models.IntegerField(default=-1)
+    average_rating = models.FloatField(default=-1)
     image_reference = models.ImageField(upload_to="product_img/")
     views = models.IntegerField(default=0)
     date_added = models.DateField(default=date.today)
@@ -77,7 +79,7 @@ class UserAccount(models.Model):
 class Review(models.Model):
     reviewer = models.ForeignKey(User, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    rating = models.IntegerField()
+    rating = models.IntegerField(validators=[MaxValueValidator(5), MinValueValidator(0)])
     comment = models.CharField(max_length=DESCRIPTION_MAX_LENGTH)
 
     def __str__(self):

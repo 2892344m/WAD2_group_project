@@ -4,12 +4,13 @@ from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.decorators import login_required
 from django.views import View
 
-from shop.models import Wishlist, Basket, UserAccount, Product, Category, User, Order
+from shop.models import Wishlist, Basket, UserAccount, Product, Category, User, Order, Review
 from shop.forms import ProductForm, SearchForm, BalanceForm, ReviewForm, ChangeUserFullnameForm, ChangeUsernameForm, BecomeASellerForm, ChangeProfileImgForm, ChangeBalanceForm
 
 from datetime import date
 from datetime import timedelta, date
 import random
+import statistics
 
 import json
 
@@ -35,6 +36,7 @@ def view_product(request, product_name_slug):
     try:
         product = Product.objects.get(slug=product_name_slug)
         context_dict['product'] = product
+        context_dict['reviews'] = Review.objects.filter(product=product)
     except Product.DoesNotExist:
         product = None  
 
@@ -228,6 +230,12 @@ def add_rating(request, product_slug):
             review.product = product         # Link the review to the product
             review.reviewer = request.user   # Set the reviewer to the current user
             review.save()
+
+            reviews = Review.objects.filter(product=product)
+            ratings = [r.rating for r in reviews]
+            product.average_rating = round(statistics.mean(ratings), 2)
+            product.save()
+
             # Redirect to the product detail page after saving
             return redirect('shop:view_product', product_name_slug=product.slug)
     else:
@@ -237,7 +245,7 @@ def add_rating(request, product_slug):
         'form': form,
         'product': product,
     }
-    return render(request, 'shop/add_rating.html', context)
+    return render(request, 'shop/add_rating.html', context=context)
 
 # Allows user to view details of account
 @login_required
