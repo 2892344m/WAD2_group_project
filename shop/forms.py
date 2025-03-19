@@ -32,3 +32,9 @@ class ChangeUsernameForm(forms.Form):
 
 class BecomeASellerForm(forms.Form):
     seller = forms.BooleanField()
+
+class ChangeProfileImgForm(forms.Form):
+    img = forms.ImageField()
+
+class ChangeBalanceForm(forms.Form):
+    balance = forms.FloatField()

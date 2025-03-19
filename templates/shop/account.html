@@ -6,23 +6,32 @@
 {% endblock %}
 
 {% block body_block %}
-<div>
-    {% if userAccount.account_img %}
-        <img src="{{ userAccount.account_img.url }}" alt="{{ user.username }}'s account image" class="img-fluid mb-4">
-    {% endif %}
-    <ul class="nav flex-column">
-        <li>{{ user.username }}</li>
-        <li>{{ user.first_name }}</li>
-        <li>{{ user.last_name }}</li>
-    </ul>
-</div>
-<div>
-    <ul class="nav flex-column">
-        <li class="nav-item"><a class="nav-link" href="{% url 'shop:change_name' %}">Change Name</a></li>
-        <li class="nav-item"><a class="nav-link" href="{% url 'shop:change_username' %}">Change Username</a></li>
-        {% if userAccount.seller_account == False %}
-        <li class="nav-item"><a class="nav-link" href="{% url 'shop:become_seller' %}">Become a seller</a></li>
+{% if user.is_authenticated %}
+<div class="row justify-content-center">
+    <div class="account-box col-md-3">
+        {% if userAccount.account_img %}
+            <img src="{{ userAccount.account_img.url }}" alt="{{ user.username }}'s account image" class="img-fluid mb-4">
         {% endif %}
-    </ul> 
+        <ul class="nav flex-column">
+            <li><p>Name: {{ user.username }} {{ user.first_name }}</p></li>
+            <li><p>Username: {{ user.last_name }}</p></li>
+            <li><p>Balance: {{ userAccount.balance }}</p></li>
+        </ul>
+    </div>
+    <div class="col-md-3">
+        <ul class="nav flex-column" id="account-interactions">
+            <li class="nav-item"><a class="btn btn-primary mt-3" href="{% url 'shop:change_name' %}">Change Name</a></li>
+            <li class="nav-item"><a class="btn btn-primary mt-3" href="{% url 'shop:change_username' %}">Change Username</a></li>
+            <li class="navitem"><a class="btn btn-primary mt-3" href="{% url 'shop:change_profile_img' %}">Change Profile Picture</a></li>
+            <li class="nav-item"><a class="btn btn-primary mt-3" href="{% url 'auth_password_change' %}">Change Password</a></li>
+            <li class="nav-item"><a class="btn btn-primary mt-3" href="{% url 'shop:change_balance' %}">Change Balance</a></li>
+            {% if userAccount.seller_account %}
+            <li class="nav-item"><a class="btn btn-primary mt-3" href="{% url 'shop:add_product' %}">Add Product</a></li>
+            {% else %}
+            <li class="nav-item"><a class="btn btn-primary mt-3" href="{% url 'shop:become_seller' %}">Become a seller</a></li>
+            {% endif %}
+        </ul> 
+    </div>
 </div>
+{% endif %}
 {% endblock %}

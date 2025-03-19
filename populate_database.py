@@ -253,7 +253,7 @@ def add_user(user):
     return u
 
 def add_user_account(user, user_account):
-    USER_PLACEHOLDER_IMG = 'default.svg'
+    USER_PLACEHOLDER_IMG = 'profile_img/default.svg'
     u = UserAccount.objects.get_or_create(user=user, 
                                           seller_account=user_account['seller_account'],
                                           balance=user_account['balance'],

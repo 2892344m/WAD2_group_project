@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.views import View
 
 from shop.models import Wishlist, Basket, UserAccount, Product, Category, User
-from shop.forms import ProductForm, SearchForm, BalanceForm, ReviewForm, ChangeUserFullnameForm, ChangeUsernameForm, BecomeASellerForm
+from shop.forms import ProductForm, SearchForm, BalanceForm, ReviewForm, ChangeUserFullnameForm, ChangeUsernameForm, BecomeASellerForm, ChangeProfileImgForm, ChangeBalanceForm
 
 from datetime import date
 
@@ -58,8 +58,6 @@ def view_category(request, category_name_slug):
 
 # Displays products based on search input
 def search(request):
-    print(request)
-    print(type(request))
     context_dict = {}
 
     if request.method == 'POST':
@@ -242,16 +240,12 @@ def view_account(request):
     context_dict['user'] = request.user
     context_dict['userAccount'] = UserAccount.objects.get(user=request.user)
 
-    print(context_dict['user'])
-    print(context_dict['userAccount'].account_img)
-
     return render(request, 'shop/account.html', context_dict)
 
 #Allows user to change first name and last name
 class ChangeUserName(View):
     @login_required
     def get(self, request):
-        print("Beginning request")
         username = request.GET['userId']
         fname = request.GET['fname']
         sname = request.GET['sname']
@@ -340,5 +334,43 @@ def become_a_seller(request):
     context_dict['form'] = form
     context_dict['change'] = "Become a Seller"
     context_dict['message'] = "Clicking this button will make you a seller, allowing you to sell products on our site. This is a quick warning that we take 92 percent of profits from transactions. To proceed please click the submit button."
+
+    return render(request, 'shop/change_account_info.html', context=context_dict)
+
+@login_required
+def change_profile_img(request):
+    context_dict = {}
+    if request.method == "POST":
+        form = ChangeProfileImgForm(request.POST, request.FILES)
+        if form.is_valid():
+            user = UserAccount.objects.get(user=request.user)
+            if(user.account_img != "default.svg"): user.account_img.delete()
+            user.account_img = form.cleaned_data['img']
+            user.save()
+            return redirect('shop:view_account')
+    else:
+        form = ChangeProfileImgForm()
+
+    context_dict['form'] = form
+    context_dict['change'] = "Change Profile Picture"
+
+    return render(request, 'shop/change_account_info.html', context=context_dict)
+
+@login_required
+def change_balance(request):
+    context_dict = {}
+    if request.method == "POST":
+        form = ChangeBalanceForm(request.POST)
+        if form.is_valid():
+            user = UserAccount.objects.get(user=request.user)
+            user.balance += form.cleaned_data['balance']
+            user.save()
+            return redirect('shop:view_account')
+    else:
+        form = ChangeBalanceForm()
+
+    context_dict['form'] = form
+    context_dict['change'] = "Change Balance"
+    context_dict['message'] = "Don't worry, we ALWAYS have your payment info :)"
 
     return render(request, 'shop/change_account_info.html', context=context_dict)

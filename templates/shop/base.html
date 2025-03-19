@@ -34,8 +34,6 @@
           <ul class="navbar-nav ml-auto mb-2 mb-lg-0">
             <li class="nav-item"><a class="nav-link" href="{% url 'shop:homepage' %}">Home</a></li>
             {% if user.is_authenticated %}           
-                <li class="nav-item"><a class="nav-link" href="{% url 'shop:add_product' %}">Add Product</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'auth_password_change' %}">Change Password</a></li>
                 <li class="nav-item"><p class="nav-link"> £{{ user_balance }}</p></li>
             {% else %}
                 <li class="nav-item"><a class="nav-link" href="{% url 'auth_login' %}">Login</a></li>
