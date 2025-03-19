@@ -26,6 +26,8 @@
 
 .account-box img {
     float: left;
+    max-height: 80%;
+    max-width: 80%;
 }
 
 .container-fluid {

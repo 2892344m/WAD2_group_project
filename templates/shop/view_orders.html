@@ -1,0 +1,26 @@
+{% extends 'shop/base.html' %}
+{% load staticfiles %}
+
+{% block title_block %}
+    Orders
+{% endblock %}
+
+{% block body_block %}
+    {% for order in orders.all %}
+        <div class="row">
+            <p>Estimated time for delivery: {{ order.time_to_deliver }}</p>
+            {% for product in order.products_to_deliver.all %}
+            <div class="col-md-3 product-box">
+                <a href="{% url 'shop:view_product' product.slug %}"> 
+                    {% if product.image_reference %}
+                    <img src="{{ product.image_reference.url}}" alt="{{ product.product_name }}"/>
+                    {% else %}
+                        <p>No image available</p>
+                    {% endif %}
+                    {{ product.product_name }}
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    {% endfor %}
+{% endblock %}

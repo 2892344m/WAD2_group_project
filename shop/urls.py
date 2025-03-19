@@ -29,4 +29,5 @@ urlpatterns = [
     path('change_profile_img/', views.change_profile_img, name="change_profile_img"),
     path('change_balance/', views.change_balance, name='change_balance'),
     path('add_views/', views.add_views, name="add_views"),
+    path('view_orders', views.view_orders, name='view_orders')
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

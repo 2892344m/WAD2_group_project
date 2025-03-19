@@ -7,16 +7,6 @@ from datetime import date
 STRING_MAX_LENGTH = 128
 DESCRIPTION_MAX_LENGTH = 250
 
-#Database for user account
-class UserAccount(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    seller_account = models.BooleanField()
-    account_img = models.ImageField(upload_to='profile_img/')
-    balance = models.FloatField(default=0)
-
-    def __str__(self):
-        return self.user.username
-
 #Database for different product categories
 class Category(models.Model):
     name = models.CharField(max_length=STRING_MAX_LENGTH, unique=True)
@@ -41,7 +31,7 @@ class Product(models.Model):
     price = models.FloatField(default=0)
     quantity = models.IntegerField(default=0)
     average_rating = models.IntegerField(default=-1)
-    image_reference = models.ImageField()
+    image_reference = models.ImageField(upload_to="product_img/")
     views = models.IntegerField(default=0)
     date_added = models.DateField(default=date.today)
     description = models.CharField(max_length=DESCRIPTION_MAX_LENGTH)
@@ -53,7 +43,36 @@ class Product(models.Model):
 
     def __str__(self):
         return self.product_name
-    
+
+#Database for basket
+class Basket(models.Model):
+    basket_owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    products = models.ManyToManyField(Product, blank=True)
+    total_price = models.FloatField(default=0)
+
+    def __str__(self):
+        return f"{self.basket_owner.username}'s basket"
+
+#Database for orders
+class Order(models.Model):
+    order_owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    products_to_deliver = models.ManyToManyField(Product, blank=True)
+    time_to_deliver = models.DateTimeField()
+
+    def __str__(self):
+        return f"{self.order_owner.username}'s order"
+
+#Database for user account
+class UserAccount(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    seller_account = models.BooleanField()
+    account_img = models.ImageField(upload_to='profile_img/')
+    balance = models.FloatField(default=0)
+    orders = models.ManyToManyField(Order, blank=True)
+
+    def __str__(self):
+        return self.user.username
+
 #Database for reviews
 class Review(models.Model):
     reviewer = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -73,12 +92,5 @@ class Wishlist(models.Model):
         return f"{self.wishlist_owner.username}'s wishlist"
 
 
-#Database for basket
-class Basket(models.Model):
-    basket_owner = models.ForeignKey(User, on_delete=models.CASCADE)
-    products = models.ManyToManyField(Product, blank=True)
-    total_price = models.FloatField(default=0)
 
-    def __str__(self):
-        return f"{self.basket_owner.username}'s basket"
     

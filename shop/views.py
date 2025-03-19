@@ -4,10 +4,12 @@ from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.decorators import login_required
 from django.views import View
 
-from shop.models import Wishlist, Basket, UserAccount, Product, Category, User
+from shop.models import Wishlist, Basket, UserAccount, Product, Category, User, Order
 from shop.forms import ProductForm, SearchForm, BalanceForm, ReviewForm, ChangeUserFullnameForm, ChangeUsernameForm, BecomeASellerForm, ChangeProfileImgForm, ChangeBalanceForm
 
 from datetime import date
+from datetime import timedelta, date
+import random
 
 import json
 
@@ -176,20 +178,24 @@ def checkout_detail(request):
 @login_required
 def purchase_confirm(request):
     context_dict = {}
+    user = request.user
     try:
-        userAccount = UserAccount.objects.get(user=request.user)
+        userAccount = UserAccount.objects.get(user=user)
         context_dict['userAccount'] = userAccount
     except UserAccount.DoesNotExist:
         userAccount = None
 
     basket, created = Basket.objects.get_or_create(basket_owner=request.user)
     if userAccount:
+        order = Order.objects.create(order_owner=user,time_to_deliver=date.today() + timedelta(days=random.randint(1, 10)))
+        for product in basket.products.all():
+            order.products_to_deliver.add(product)
+        order.save()
+        userAccount.orders.add(order)
         userAccount.balance -= basket.total_price
         userAccount.save()
 
-    basket.products.clear()
-    basket.total_price = 0
-    basket.save()
+    basket.delete()
 
     return render(request, 'shop/purchase_confirm.html', context=context_dict)    
 
@@ -374,3 +380,13 @@ def change_balance(request):
     context_dict['message'] = "Don't worry, we ALWAYS have your payment info :)"
 
     return render(request, 'shop/change_account_info.html', context=context_dict)
+
+#View the orders made by a specific user
+@login_required
+def view_orders(request):
+    context_dict = {}
+    user = UserAccount.objects.get(user=request.user)
+    
+    context_dict['orders'] = user.orders
+
+    return render(request, 'shop/view_orders.html', context=context_dict)

@@ -25,6 +25,7 @@
             <li class="navitem"><a class="btn btn-primary mt-3" href="{% url 'shop:change_profile_img' %}">Change Profile Picture</a></li>
             <li class="nav-item"><a class="btn btn-primary mt-3" href="{% url 'auth_password_change' %}">Change Password</a></li>
             <li class="nav-item"><a class="btn btn-primary mt-3" href="{% url 'shop:change_balance' %}">Change Balance</a></li>
+            <li class="nav-item"><a class="btn btn-primary mt-3" href="{% url 'shop:view_orders' %}">View Orders</a></li>
             {% if userAccount.seller_account %}
             <li class="nav-item"><a class="btn btn-primary mt-3" href="{% url 'shop:add_product' %}">Add Product</a></li>
             {% else %}
