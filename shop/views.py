@@ -287,5 +287,17 @@ def change_user_name(request):
 
     return JsonResponse({'success': False}, status=400)
 
-
+#Increments views attribute of the product model
+@csrf_protect
+def add_views(request):
+    if request.method == "POST":
+        prod_id = request.POST.get('prod_id')
+        try:
+            product = Product.objects.get(product_ID = prod_id)
+            product.views += 1
+            product.save()
+            return JsonResponse({'success':True})
+        except product.DoesNotExist:
+            return JsonResponse({'success': False})
+    return JsonResponse({'success': False})
 

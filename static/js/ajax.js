@@ -3,13 +3,14 @@ $(document).ready(function() {
     function getCSRFToken() {
         return $("input[name=csrfmiddlewaretoken]").val();
     }
+    
+    const URL = window.location.pathname;
 
     $('#change_name').click(function() {
         let forename = prompt('Please enter your first name');
         let surname = prompt('Please enter your surname');
         let userid = $(this).attr('data-userid');
 
-        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
         $.ajax({
             url: "/shop/change_name/",
             type: 'POST',
@@ -27,4 +28,21 @@ $(document).ready(function() {
             }
         });
     });
+
+    //Adds views to product
+    if (URL.indexOf("/shop/view_product/") >= 0) {
+        let prod_id = $('#product-data').attr('product-id')
+        $.ajax({
+            url: "/shop/add_views/",
+            type: "POST",
+            data: {
+                csrfmiddlewaretoken: getCSRFToken(),
+                prod_id: prod_id
+            },
+            failure: function(data) {
+                alert('Error');
+            } 
+        })
+    }
+
 });

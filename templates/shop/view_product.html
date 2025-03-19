@@ -6,7 +6,7 @@
 {% endblock %}
 
 {% block body_block %}
-<div class="container">
+<div class="container" id="product-data" product-id=" {{ product.product_ID }}">
     <h1 class="mb-4">{{ product.product_name }}</h1>
 
     {% if product.image_reference %}

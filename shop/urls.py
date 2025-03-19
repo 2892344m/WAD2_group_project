@@ -24,4 +24,5 @@ urlpatterns = [
     path('add_rating/<slug:product_slug>/', views.add_rating, name='add_rating'),
     path('account/', views.view_account, name='view_account'),
     path('change_name/', views.change_user_name, name="change_name"),
+    path('add_views/', views.add_views, name="add_views"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
