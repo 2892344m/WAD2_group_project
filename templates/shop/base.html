@@ -20,8 +20,8 @@
     <nav class="navbar navbar-expand-lg navbar-light navbar-coloring">
       <div class="row">
         <div class="col-md-3">
-          <img href="{% static 'images/icon.png' %}" alt="Company Logo">
-          <a class="navbar-brand" id="website-name" href="{% url 'shop:homepage' %}">Bob's Gadgets</a>
+          <img src="{% static 'images/icon.png' %}" alt="Company Logo" id="website-logo" style="width:30%;height:100%;">
+          <a class="navbar-brand" href="{% url 'shop:homepage' %}" id="website-name">Bob's Gadgets</a>
         </div>
         <div class="col-md-3" id="search-bar">
           <!-- Search form - Redirects to search.html -->
