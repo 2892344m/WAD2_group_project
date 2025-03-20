@@ -19,28 +19,20 @@
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-light navbar-coloring">
       <div class="row">
-        <div class="col-md-3">
+        <div class="col-md-4">
           <img src="{% static 'images/icon.png' %}" alt="Company Logo" id="website-logo" style="width:30%;height:100%;">
           <a class="navbar-brand" href="{% url 'shop:homepage' %}" id="website-name">Bob's Gadgets</a>
         </div>
-        <div class="col-md-3" id="search-bar">
+        <div class="col-md-4">
           <!-- Search form - Redirects to search.html -->
-          <form method = "POST" action="{% url 'shop:search' %}">
+          <form method = "POST" action="{% url 'shop:search' %}"  id="search-bar">
             {% csrf_token %}
             {{ search_form.as_p }}
+            <button class="btn btn-primary" type="submit">Search</button>
           </form>
         </div>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" 
-                data-bs-target="#navbarContent" aria-controls="navbarContent" 
-                aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>Search
-        </button>
-        <div class="collapse navbar-collapse" id="navbar-Content">
-          <ul class="navbar-nav ml-auto mb-2 mb-lg-0" id="navbar-list">
-            <li class="nav-item"><a class="nav-link" href="{% url 'shop:homepage' %}">Home</a></li>
-            {% if user.is_authenticated == False %}   
-            {% endif %}
-          </ul>
+        <div class="col-md-4">
+            <a class="navbar-brand" href="{% url 'shop:homepage' %}" id="navbar-content">Home</a>
         </div>
       </div>
     </nav>

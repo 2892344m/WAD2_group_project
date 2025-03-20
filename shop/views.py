@@ -53,12 +53,12 @@ def view_category(request, category_name_slug):
         category = Category.objects.get(slug=category_name_slug)
         products = Product.objects.filter(category=category)
         context_dict['products'] = products
-        context_dict['category'] = category
+        context_dict['message'] = category.name
     except Category.DoesNotExist:
         context_dict['products'] = None
-        context_dict['category'] = None
+        context_dict['category'] = "Unknown Category"
 
-    return render(request, 'shop/category.html', context=context_dict)
+    return render(request, 'shop/search.html', context=context_dict)
 
 # Displays products based on search input
 def search(request):
@@ -80,6 +80,7 @@ def search(request):
 
             context_dict['form'] = form
             context_dict['products'] = filtered_products
+            context_dict['message'] = "Search"
 
             return render(request, 'shop/search.html', context=context_dict)
     else:
@@ -93,6 +94,8 @@ def search(request):
 # This allows a seller to add a product to the shop
 @login_required
 def add_product(request):
+    context_dict = {}
+
     if request.method == 'POST':
         form = ProductForm(request.POST, request.FILES)
         if form.is_valid():
@@ -103,12 +106,23 @@ def add_product(request):
             return redirect('/shop/')  # Redirect after saving
     else:
         form = ProductForm()
-    return render(request, 'shop/add_product.html', {'form': form})
 
+    context_dict['form'] = form
+    context_dict['user'] = UserAccount.objects.get(user=request.user)
+    
+    return render(request, 'shop/add_product.html', context=context_dict)
+
+#Wishlist methods, allowing a user to view, add, and remove from their wishlist
 @login_required
 def wishlist_detail(request):
-    wishlist, created = Wishlist.objects.get_or_create(wishlist_owner=request.user)
-    return render(request, 'shop/wishlist.html', {'wishlist': wishlist, 'products': wishlist.products.all()})
+    context_dict = {}
+
+    wishlist = Wishlist.objects.get_or_create(wishlist_owner=request.user)[0]
+
+    context_dict['products'] = wishlist.products.all()
+    context_dict['type'] = "Wishlist"
+
+    return render(request, 'shop/basket.html', context=context_dict)
 
 @login_required
 def add_to_wishlist(request, product_slug):
@@ -124,18 +138,20 @@ def remove_from_wishlist(request, product_slug):
     wishlist.products.remove(product)
     return redirect('shop:wishlist_detail')
 
+#Same logic as wishlist, but with additional functionality for purchasing items
 @login_required
 def basket_detail(request):
-    basket, created = Basket.objects.get_or_create(basket_owner=request.user)
 
-    total = 0
-    for productInBasket in basket.products.all():
-        total += productInBasket.price
+    context_dict = {}
 
-    basket.total_price = total
+    basket = Basket.objects.get_or_create(basket_owner=request.user)[0]
     basket.save()
 
-    return render(request, 'shop/basket.html', {'basket': basket, 'products': basket.products.all()})
+    context_dict['basket'] = basket
+    context_dict['products'] = basket.products.all()
+    context_dict['type'] = "Basket"
+
+    return render(request, 'shop/basket.html', context=context_dict)
 
 @login_required
 def add_to_basket(request, product_slug):
@@ -157,6 +173,7 @@ def remove_from_basket(request, product_slug):
     
     return redirect('shop:basket_detail')
 
+#Confirm that user wants to purchase basket
 @login_required
 def checkout_detail(request):
     basket, created = Basket.objects.get_or_create(basket_owner=request.user)
@@ -177,17 +194,21 @@ def checkout_detail(request):
 
     return render(request, 'shop/checkout.html', {'basket': basket, 'products': basket.products.all(), 'valid': valid})
 
+#Converts basket into an order, and assign it to the orders of the user
 @login_required
 def purchase_confirm(request):
     context_dict = {}
     user = request.user
+
+    #Load user and their basket
     try:
         userAccount = UserAccount.objects.get(user=user)
+        basket = Basket.objects.get(basket_owner=request.user)
         context_dict['userAccount'] = userAccount
     except UserAccount.DoesNotExist:
-        userAccount = None
+        return HttpResponse("Error! User or basket failed to load.")
 
-    basket, created = Basket.objects.get_or_create(basket_owner=request.user)
+    #Create a new order, append all products in basket to order, and order to user's list, then deduct balance from account
     if userAccount:
         order = Order.objects.create(order_owner=user,time_to_deliver=date.today() + timedelta(days=random.randint(1, 10)))
         for product in basket.products.all():
@@ -197,10 +218,11 @@ def purchase_confirm(request):
         userAccount.balance -= basket.total_price
         userAccount.save()
 
-    basket.delete()
+    basket.delete() #Delete basket, will be recreated when new items are added
 
     return render(request, 'shop/purchase_confirm.html', context=context_dict)    
 
+#Add money to account
 @login_required
 def edit_balance(request):
     try:
@@ -217,7 +239,7 @@ def edit_balance(request):
         form = BalanceForm(instance=userAccount)
     return render(request, 'shop/edit_balance.html', {'form': form})
 
-# NEW VIEW: Handles adding a rating/review for a product
+#Add a rating to a product
 @login_required
 def add_rating(request, product_slug):
     # Retrieve the product by slug
@@ -312,6 +334,7 @@ def user_change_full_name(request):
 
     return render(request, 'shop/change_account_info.html', context=context_dict)
 
+#Views used to change attributes of User or UserAccount. All very similar. 
 @login_required
 def user_change_username(request):
     context_dict = {}

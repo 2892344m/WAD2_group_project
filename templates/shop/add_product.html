@@ -6,6 +6,7 @@
 {% endblock %}
 
 {% block body_block %}
+{% if user.seller_account %}
 <div class="row">
     <div class="col-md-8 offset-md-2">
         <h1>Add a New Product</h1>
@@ -16,4 +17,9 @@
         </form>
     </div>
 </div>
+{% else %}
+<div class="row">
+    <h3>This account is not a seller. To become a seller please go to the account page.</h3>
+</div>
+{% endif %}
 {% endblock %}

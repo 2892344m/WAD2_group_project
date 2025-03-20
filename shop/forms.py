@@ -15,7 +15,9 @@ class ReviewForm(forms.ModelForm):
         fields = ('rating', 'comment',)
 
 class SearchForm(forms.Form):
-    search = forms.CharField(max_length=STRING_MAX_LENGTH, initial="Search for products here.")
+    search = forms.CharField(max_length=STRING_MAX_LENGTH,
+                             widget=forms.TextInput(attrs={'placeholder': 'Enter search here'}),
+                             label="")
 
 class BalanceForm(forms.ModelForm):
     class Meta:

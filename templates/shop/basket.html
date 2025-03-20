@@ -1,24 +1,33 @@
 {% extends 'shop/base.html' %}
 {% load staticfiles %}
 
-{% block title_block %}My Basket{% endblock %}
+{% block title_block %}{{ type }}{% endblock %}
 {% block body_block %}
+
+<!-- Displays both basket and wishlist
+ Only gives option to purchase if a basket. Wishlist just displays items.-->
 <div class="container">
-    <h1 class="mt-4">My Basket</h1>
+    <h1 class="mt-4">My {{ type }}</h1>
     {% if products %}
     <ul class="list-group">
         {% for product in products %}
         <li class="list-group-item d-flex justify-content-between align-items-center">
             <a href="{% url 'shop:view_product' product.slug %}">{{ product.product_name }}</a>
             <h3 class="mt-6">£{{ product.price }}</h3>
-            <a href="{% url 'shop:remove_from_basket' product.slug %}" class="btn btn-danger btn-sm">Remove</a>
+            {% if basket %}
+                <a href="{% url 'shop:remove_from_basket' product.slug %}" class="btn btn-danger btn-sm">Remove</a>
+            {% else %}
+                <a href="{% url 'shop:remove_from_wishlist' product.slug %}" class="btn btn-danger btn-sm">Remove</a>
+            {% endif %}
         </li>
         {% endfor %}
+        {% if basket %}
         <h2 class="mt-5"> Total: £{{ basket.total_price }} </h2>
         <a href="{% url 'shop:checkout_detail' %}" class="btn btn-primary mt-3">Proceed To Checkout</a>
+        {% endif %}
     </ul>
     {% else %}
-    <p>Your Basket is empty.</p>
+    <p>Your {{ type }} is empty</p>
     {% endif %}
 </div>
 {% endblock %}

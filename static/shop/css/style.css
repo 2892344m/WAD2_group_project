@@ -88,12 +88,24 @@
     border-color: #2d6351;
 }
 
-#search-bar form {
-    margin-top: 10px;  
+#search-bar {
+    display: flex;
+    align-items: center;
+    margin-top: 5%;
+}
+
+#search-bar input {
+    margin-top: 15px;
+    margin-right: 10px;
+    height: 40px;
+    width: 500px;
 }
 
 #navbar-content {
-    margin-right: 100px;
+    color: white;
+    float: right;
+    margin-top: 7%;
+    font-weight: bold;
 }
 
 /* Global CSS */
