@@ -8,17 +8,19 @@
 {% block body_block %}
 {% if user.is_authenticated %}
 <div class="row justify-content-center">
-    <div class="account-box col-md-3">
+    <div class="col-md-3">
         {% if userAccount.account_img %}
             <img src="{{ userAccount.account_img.url }}" alt="{{ user.username }}'s account image" class="img-fluid mb-4">
         {% endif %}
+    </div>
+    <div class="account-box col-md-2">
         <ul class="nav flex-column">
             <li><p>Name: {{ user.username }} {{ user.first_name }}</p></li>
             <li><p>Username: {{ user.last_name }}</p></li>
             <li><p>Balance: {{ userAccount.balance }}</p></li>
         </ul>
     </div>
-    <div class="col-md-3">
+    <div class="col-md-4">
         <ul class="nav flex-column" id="account-interactions">
             <li class="nav-item"><a class="btn btn-primary mt-3" href="{% url 'shop:change_name' %}">Change Name</a></li>
             <li class="nav-item"><a class="btn btn-primary mt-3" href="{% url 'shop:change_username' %}">Change Username</a></li>

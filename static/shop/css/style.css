@@ -26,8 +26,8 @@
 
 .account-box img {
     float: left;
-    max-height: 80%;
-    max-width: 80%;
+    max-height: 70%;
+    max-width: 70%;
 }
 
 /* Product View CSS */
@@ -59,6 +59,44 @@
     border-radius: 5%;
 }
 
+/* CSS for base.html */
+.navbar-coloring {
+    background-color:#2d6351;
+    color: white;
+}
+
+#website-name {
+    color: white;
+    font-weight: bold;
+}
+
+#navbar-list a {
+    color: white;
+}
+
+.sidebar-coloring {
+    background-color: cadetblue;
+    color: white;
+}
+
+.sidebar-coloring a {
+    color: white;
+}
+
+.sidebar-coloring li:hover {
+    border-style: solid;
+    border-color: #2d6351;
+}
+
+#search-bar form {
+    margin-top: 10px;  
+}
+
+#navbar-content {
+    margin-right: 100px;
+}
+
+/* Global CSS */
 .container-fluid {
     min-height: 100vh; 
     display: flex;

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-{% load static %}
+{% load staticfiles %}
 {% load shop_template_tags %}
 <html lang="en">
 <head>
@@ -17,26 +17,28 @@
 <body>
   <header>
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <div class="container">
-        <a class="navbar-brand" href="{% url 'shop:homepage' %}">Bob's Gadgets</a>
-        <!-- Search form - Redirects to search.html -->
-        <form method = "POST" action="{% url 'shop:search' %}">
-          {% csrf_token %}
-          {{ search_form.as_p }}
-        </form>
+    <nav class="navbar navbar-expand-lg navbar-light navbar-coloring">
+      <div class="row">
+        <div class="col-md-3">
+          <img href="{% static 'images/icon.png' %}" alt="Company Logo">
+          <a class="navbar-brand" id="website-name" href="{% url 'shop:homepage' %}">Bob's Gadgets</a>
+        </div>
+        <div class="col-md-3" id="search-bar">
+          <!-- Search form - Redirects to search.html -->
+          <form method = "POST" action="{% url 'shop:search' %}">
+            {% csrf_token %}
+            {{ search_form.as_p }}
+          </form>
+        </div>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" 
                 data-bs-target="#navbarContent" aria-controls="navbarContent" 
                 aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
+          <span class="navbar-toggler-icon"></span>Search
         </button>
-        <div class="collapse navbar-collapse" id="navbarContent">
-          <ul class="navbar-nav ml-auto mb-2 mb-lg-0">
+        <div class="collapse navbar-collapse" id="navbar-Content">
+          <ul class="navbar-nav ml-auto mb-2 mb-lg-0" id="navbar-list">
             <li class="nav-item"><a class="nav-link" href="{% url 'shop:homepage' %}">Home</a></li>
-            {% if user.is_authenticated %}           
-                <li class="nav-item"><p class="nav-link"> £{{ user_balance }}</p></li>
-            {% else %}
-                <li class="nav-item"><a class="nav-link" href="{% url 'auth_login' %}">Login</a></li>
+            {% if user.is_authenticated == False %}   
             {% endif %}
           </ul>
         </div>
@@ -47,7 +49,7 @@
 
     <div class="container-fluid">
       <div class="row">
-          <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+          <nav class="sidebar-coloring col-md-2 d-md-block">
               <div class="sidebar-sticky">
                 {% block sidebar_block %}
                 <h3>Categories</h3>
@@ -80,6 +82,10 @@
                     <li class="nav-item">
                       <a class="nav-link" href="{% url 'registration_register' %}">
                           <span data-feather="archive"></span>Register</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="{% url 'auth_login' %}">
+                        <span data-feather="archive"></span>Login</a>
                     </li>
                     {% endif %}
                   </ul>
