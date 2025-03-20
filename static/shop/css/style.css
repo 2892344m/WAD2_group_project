@@ -30,6 +30,35 @@
     max-width: 80%;
 }
 
+/* Product View CSS */
+.product-view img {
+    max-height: 50%;
+    max-width: 50%;
+}
+
+.product-view ul {
+    background-color: #f8f9fa;
+    padding: 10px;
+    border-radius: 5%;
+    margin-left: 5px;
+}
+
+.review-box {
+    background-color: #f8f9fa;
+    padding: 5px;
+    border-radius: 5%;
+}
+
+.product-interact a{
+    margin: 5px;
+}
+
+#review-message {
+    background-color: lightgray;
+    padding: 5px;
+    border-radius: 5%;
+}
+
 .container-fluid {
     min-height: 100vh; 
     display: flex;
