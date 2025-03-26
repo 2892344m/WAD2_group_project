@@ -280,37 +280,33 @@ class TestSearch(TestCase):
         self.assertEqual(set(response.context['products']),{self.test_product,self.test_product2})
 
 #Having issues getting the form for this working, will have another look later
-# class TestAddProduct(TestCase):
-
-#     def setUp(self):
-#         self.test_user = add_user()
-#         self.test_category = add_category()
-#         self.test_category2 = add_category(name="category2")
-#         self.test_user_account = add_user_account(user=self.test_user)
-#         self.test_product = add_product(seller=self.test_user, category=self.test_category2)
-
-#         self.form_data = {
-#             'product_name':"potash",
-#             'price':'3.02',
-#             'image_reference':'product_img/default.jpg',
-#             'description':'test',
-#             'category':'category2',
-#         }
-
-#     def test_add_product(self):
-
-#         form = ProductForm(data=self.form_data)
-#         self.assertTrue(form.is_valid())
-
-#         response = self.client.post(reverse('shop:add_product'), self.form_data)
-
-#         self.assertEqual(response.status_code,200)
-#         self.assertEqual(len(self.test_category.objects.all()), 1)
-
-class TestWishlist(TestCase):
+class TestAddProduct(TestCase):
 
     def setUp(self):
         self.test_user = add_user()
+        self.client.force_login(self.test_user)
+        self.test_category = add_category()
+
+        self.form_data = {
+            'product_name':"potash",
+            'price':3.02,
+            'description':'test',
+            'category':self.test_category.id,
+        }
+
+    def test_add_product(self):
+        form = ProductForm(data=self.form_data)
+        self.assertTrue(form.is_valid())
+
+        response = self.client.post(reverse('shop:add_product'), self.form_data)
+
+        self.assertEqual(response.status_code,302)
+        self.assertEqual(Product.objects.get(product_name="potash").category, self.test_category)
+
+class TestWishlist(TestCase):
+    def setUp(self):
+        self.test_user = add_user()
+        self.client.force_login(self.test_user)
         self.test_category = add_category()
         self.test_product = add_product(seller=self.test_user, category=self.test_category)
         self.test_product2 = add_product(seller=self.test_user, category=self.test_category, product_name="test2")
@@ -319,14 +315,97 @@ class TestWishlist(TestCase):
         self.wishlist = add_wishlist(wishlist_owner=self.test_user)
 
     def test_empty_wishlist(self):
+        response = self.client.get(reverse('shop:wishlist_detail'))
+
+        self.assertEqual(response.status_code,200)
+        self.assertTemplateUsed(response, 'shop/basket.html')
+        self.assertEqual(len(response.context['products']), 0)
+        self.assertContains(response, "Wishlist")
+
+    def test_filled_wishlist(self):
+        self.wishlist.products.add(self.test_product)
+        self.wishlist.products.add(self.test_product2)
+        self.wishlist.products.add(self.test_product3)
 
         response = self.client.get(reverse('shop:wishlist_detail'))
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Wishlist")
+        self.assertEqual(set(response.context['products']), {self.test_product, self.test_product2, self.test_product3})
+
+class TestBasket(TestCase):
+    def setUp(self):
+        self.test_user = add_user()
+        self.client.force_login(self.test_user)
+        self.test_category = add_category()
+        self.test_product = add_product(seller=self.test_user, category=self.test_category)
+        self.test_product2 = add_product(seller=self.test_user, category=self.test_category, product_name="test2")
+        self.test_product3 = add_product(seller=self.test_user, category=self.test_category, product_name="test3")
+
+        self.basket = add_basket(basket_owner=self.test_user)
+
+    def test_empty_basket(self):
+        response = self.client.get(reverse('shop:basket_detail'))
+
+        self.assertEqual(response.status_code,200)
+        self.assertTemplateUsed(response, 'shop/basket.html')
         self.assertEqual(len(response.context['products']), 0)
+        self.assertContains(response, "Basket")
 
+    def test_filled_wishlist(self):
+        self.basket.products.add(self.test_product)
+        self.basket.products.add(self.test_product2)
+        self.basket.products.add(self.test_product3)
 
+        response = self.client.get(reverse('shop:basket_detail'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(set(response.context['products']), {self.test_product, self.test_product2, self.test_product3})
+
+class TestPurchase(TestCase):
+    def setUp(self):
+        self.test_user = add_user()
+        self.client.force_login(self.test_user)
+        self.test_category = add_category()
+        self.test_product = add_product(seller=self.test_user, category=self.test_category)
+        self.test_product2 = add_product(seller=self.test_user, category=self.test_category, product_name="test2")
+        self.test_product3 = add_product(seller=self.test_user, category=self.test_category, product_name="test3")
+
+        self.basket = add_basket(basket_owner=self.test_user)
+        self.basket.products.add(self.test_product)
+        self.basket.products.add(self.test_product2)
+        self.basket.products.add(self.test_product3)
+
+    def test_checkout_detail_insufficient_balance(self):
+        self.test_account = add_user_account(user=self.test_user, balance=0)
+        
+        response = self.client.get(reverse('shop:checkout_detail'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['valid'], False)
+
+    def test_checkout_detail_sufficient_balance(self):
+        self.test_account = add_user_account(user=self.test_user, balance=9_000_000)
+        
+        response = self.client.get(reverse('shop:checkout_detail'))
+
+        print(self.test_account.user)
+        print(response.context['products'])
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(set(response.context['products']), {self.test_product, self.test_product2, self.test_product3})
+        self.assertEqual(response.context['basket'], self.basket)
+
+    def test_purchase_confirm_no_useraccount(self):
+        response = self.client.get(reverse('shop:purchase_confirm'))
+
+        self.assertContains(response, "Error! User or basket failed to load.")
+
+    def test_purchase_confirm_with_useraccount(self):
+        self.test_account = add_user_account(user=self.test_user, balance=9_000_000)
+        old_basket = set(Basket.objects.all())
+        response = self.client.get(reverse('shop:checkout_detail'))
+        print(response.context['userAccount'])
+        self.assertNotEqual(set(Basket.objects.all()), old_basket)
 
 # Helper Methods
 def add_user(username="testUsername", email="test@test.com", password="testPassword"):

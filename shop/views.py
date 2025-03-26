@@ -200,13 +200,15 @@ def purchase_confirm(request):
     context_dict = {}
     user = request.user
 
-    #Load user and their basket
+    # Load user and their basket
     try:
         userAccount = UserAccount.objects.get(user=user)
         basket = Basket.objects.get(basket_owner=request.user)
-        context_dict['userAccount'] = userAccount
+        context_dict['basket'] = basket
     except UserAccount.DoesNotExist:
         return HttpResponse("Error! User or basket failed to load.")
+    
+    context_dict['userAccount'] = userAccount
 
     #Create a new order, append all products in basket to order, and order to user's list, then deduct balance from account
     if userAccount:
