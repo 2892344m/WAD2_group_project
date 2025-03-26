@@ -68,7 +68,7 @@ class Order(models.Model):
 class UserAccount(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     seller_account = models.BooleanField(default=False)
-    account_img = models.ImageField(upload_to='profile_img/')
+    account_img = models.ImageField(upload_to='profile_img/', default='profile_img/default.svg')
     balance = models.FloatField(default=0)
     orders = models.ManyToManyField(Order, blank=True)
 
