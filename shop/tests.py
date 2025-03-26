@@ -1,6 +1,9 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
+from django.urls import reverse
+from django.test import RequestFactory
 
+from shop.forms import ProductForm, SearchForm
 from shop.models import Basket, Category, Order, Product, Review, UserAccount, Wishlist
 
 # Model Tests
@@ -25,7 +28,7 @@ class UserAccountModelTests(TestCase):
         testUser = add_user()
         account = add_user_account(testUser)
 
-        self.assertEqual((account.account_img == 'profile_img/default.svg'), True)
+        self.assertEqual((account.account_img == 'profile_img/default.jpg'), True)
 
     def test_account_positive_balance(self):
         testUser = add_user()
@@ -183,10 +186,146 @@ class OrderModelTests(TestCase):
         self.assertEquals((len(order.products_to_deliver.all()) == 2), True)
 
 #Views Tests
-class TestHomepage:
-    def test_homepage_with_products(self):
-        pass
-    
+class TestHomepage(TestCase):
+    def test_homepage(self):
+        test_user = add_user()
+        test_category = add_category()
+        testProduct = add_product(seller=test_user, category=test_category, product_name="test")
+        testProduct2 = add_product(seller=test_user, category=test_category, product_name="test2")
+        testProduct3 = add_product(seller=test_user, category=test_category, product_name="test3")
+        testProduct4 = add_product(seller=test_user, category=test_category, product_name="test4")
+
+        response = self.client.get(reverse('shop:homepage'))    
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.context['most_viewed_products']), 4)
+        self.assertContains(response, "test")
+
+class TestViewProduct(TestCase):
+
+    def setUp(self):
+        self.test_user = add_user()
+        self.test_category = add_category()
+        self.test_product = add_product(seller=self.test_user, category=self.test_category,product_name="banana")
+
+    def test_product_no_reviews(self):
+        response = self.client.get(reverse('shop:view_product', kwargs={'product_name_slug':self.test_product.slug}))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.context['reviews']), 0)
+        self.assertContains(response, "banana")
+
+    def test_product_with_reviews(self):
+        test_review1 = add_review(reviewer=self.test_user,product=self.test_product,rating=3,comment="test")
+        test_review2 = add_review(reviewer=self.test_user,product=self.test_product,rating=3,comment="test2")
+        test_review3 = add_review(reviewer=self.test_user,product=self.test_product,rating=3,comment="test3")
+
+        response = self.client.get(reverse('shop:view_product', kwargs={'product_name_slug':self.test_product.slug}))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.context['reviews']), 3)
+        self.assertContains(response, "banana")
+
+class TestViewCategory(TestCase):
+    def test_unknown_category(self):
+        
+        response = self.client.get(reverse('shop:view_category', kwargs={'category_name_slug':'empty'}))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['products'], None)
+        self.assertEqual(response.context['message'], "Unknown Category")
+
+    def test_category(self):
+        test_user = add_user()
+        test_category = add_category(name="bananas")
+        test_product = add_product(seller=test_user, category=test_category,product_name="banana")
+        test_product2 = add_product(seller=test_user, category=test_category,product_name="banana2")
+
+        response = self.client.get(reverse('shop:view_category', kwargs={'category_name_slug':"bananas"}))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.context['products']), 2)
+        self.assertEqual(response.context['message'], "bananas")
+
+class TestSearch(TestCase):
+
+    def setUp(self):
+        self.test_user = add_user()
+        self.test_category = add_category()
+        self.test_product = add_product(seller=self.test_user, category=self.test_category,product_name="potato")
+        self.test_product2 = add_product(seller=self.test_user, category=self.test_category,product_name="potash")
+        self.test_product3 = add_product(seller=self.test_user, category=self.test_category,product_name="banana")
+
+        self.form_data = {
+            'search': 'pot',
+        }
+
+    def test_empty_search(self):
+
+        response = self.client.get(reverse('shop:search'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Search")
+        self.assertEqual(set(response.context['products']),{self.test_product, self.test_product2, self.test_product3})
+
+    def test_with_search(self):
+
+        form = SearchForm(data=self.form_data)
+
+        self.assertTrue(form.is_valid())
+
+        response = self.client.post(reverse('shop:search'), self.form_data)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(set(response.context['products']),{self.test_product,self.test_product2})
+
+#Having issues getting the form for this working, will have another look later
+# class TestAddProduct(TestCase):
+
+#     def setUp(self):
+#         self.test_user = add_user()
+#         self.test_category = add_category()
+#         self.test_category2 = add_category(name="category2")
+#         self.test_user_account = add_user_account(user=self.test_user)
+#         self.test_product = add_product(seller=self.test_user, category=self.test_category2)
+
+#         self.form_data = {
+#             'product_name':"potash",
+#             'price':'3.02',
+#             'image_reference':'product_img/default.jpg',
+#             'description':'test',
+#             'category':'category2',
+#         }
+
+#     def test_add_product(self):
+
+#         form = ProductForm(data=self.form_data)
+#         self.assertTrue(form.is_valid())
+
+#         response = self.client.post(reverse('shop:add_product'), self.form_data)
+
+#         self.assertEqual(response.status_code,200)
+#         self.assertEqual(len(self.test_category.objects.all()), 1)
+
+class TestWishlist(TestCase):
+
+    def setUp(self):
+        self.test_user = add_user()
+        self.test_category = add_category()
+        self.test_product = add_product(seller=self.test_user, category=self.test_category)
+        self.test_product2 = add_product(seller=self.test_user, category=self.test_category, product_name="test2")
+        self.test_product3 = add_product(seller=self.test_user, category=self.test_category, product_name="test3")
+
+        self.wishlist = add_wishlist(wishlist_owner=self.test_user)
+
+    def test_empty_wishlist(self):
+
+        response = self.client.get(reverse('shop:wishlist_detail'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Wishlist")
+        self.assertEqual(len(response.context['products']), 0)
+
 
 
 # Helper Methods
