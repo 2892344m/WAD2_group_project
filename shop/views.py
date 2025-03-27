@@ -56,7 +56,7 @@ def view_category(request, category_name_slug):
         context_dict['message'] = category.name
     except Category.DoesNotExist:
         context_dict['products'] = None
-        context_dict['category'] = "Unknown Category"
+        context_dict['message'] = "Unknown Category"
 
     return render(request, 'shop/search.html', context=context_dict)
 
