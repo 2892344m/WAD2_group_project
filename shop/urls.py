@@ -20,6 +20,7 @@ urlpatterns = [
     path('basket/remove/<slug:product_slug>/', views.remove_from_basket, name='remove_from_basket'),
     path('checkout/', views.checkout_detail, name='checkout_detail'),
     path('purchase_confirm/', views.purchase_confirm, name='purchase_confirm'),
+    path('edit_balance/', views.edit_balance, name='edit_balance'),
     path('add_rating/<slug:product_slug>/', views.add_rating, name='add_rating'),
     path('account/', views.view_account, name='view_account'),
     path('change_name/', views.user_change_full_name, name="change_name"),

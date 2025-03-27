@@ -222,6 +222,23 @@ def purchase_confirm(request):
 
     return render(request, 'shop/purchase_confirm.html', context=context_dict)    
 
+#Add money to account
+@login_required
+def edit_balance(request):
+    try:
+        userAccount = UserAccount.objects.get(user=request.user)
+    except UserAccount.DoesNotExist:
+        userAccount = None
+
+    if request.method == 'POST':
+        form = BalanceForm(request.POST, instance=userAccount)
+        if form.is_valid():
+            form.save()
+            return redirect('/shop/')
+    else:
+        form = BalanceForm(instance=userAccount)
+    return render(request, 'shop/edit_balance.html', {'form': form})
+
 #Add a rating to a product
 @login_required
 def add_rating(request, product_slug):

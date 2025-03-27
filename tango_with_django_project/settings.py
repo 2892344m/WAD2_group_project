@@ -28,12 +28,12 @@ key = False
 with open('secret.key') as f:
     key = f.read().strip()
 
-SECRET_KEY = '57zj8#5)68j^z1)dx^4cjbeb4wt*cnry-90&*e65!9&s2u)s#d'
+SECRET_KEY = key
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['2892344m.pythonanywhere.com']
+ALLOWED_HOSTS = ['2892344m.pythonanywhere.com', '127.0.0.1']
 
 # Application definition
 
