@@ -222,23 +222,6 @@ def purchase_confirm(request):
 
     return render(request, 'shop/purchase_confirm.html', context=context_dict)    
 
-#Add money to account
-@login_required
-def edit_balance(request):
-    try:
-        userAccount = UserAccount.objects.get(user=request.user)
-    except UserAccount.DoesNotExist:
-        userAccount = None
-
-    if request.method == 'POST':
-        form = BalanceForm(request.POST, instance=userAccount)
-        if form.is_valid():
-            form.save()
-            return redirect('/shop/')
-    else:
-        form = BalanceForm(instance=userAccount)
-    return render(request, 'shop/edit_balance.html', {'form': form})
-
 #Add a rating to a product
 @login_required
 def add_rating(request, product_slug):
@@ -277,27 +260,6 @@ def view_account(request):
     context_dict['userAccount'] = UserAccount.objects.get(user=request.user)
 
     return render(request, 'shop/account.html', context_dict)
-
-#Allows user to change first name and last name
-class ChangeUserName(View):
-    @login_required
-    def get(self, request):
-        username = request.GET['userId']
-        fname = request.GET['fname']
-        sname = request.GET['sname']
-
-        try:
-            user = User.objects.get(username=username)
-        except User.DoesNotExist:
-            return HttpResponse()
-        except ValueError:
-            return HttpResponse()
-        
-        user.first_name = fname
-        user.last_name = sname
-        user.save()
-
-        return HttpResponse()
 
 #Increments views attribute of the product model
 @csrf_protect
