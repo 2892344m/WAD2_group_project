@@ -23,13 +23,17 @@ MEDIA_DIR = os.path.join(BASE_DIR, 'media')
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
+
+key = False
+with open('secret.key') as f:
+    key = f.read().strip()
+
 SECRET_KEY = '57zj8#5)68j^z1)dx^4cjbeb4wt*cnry-90&*e65!9&s2u)s#d'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ['2892344m.pythonanywhere.com']
 
 # Application definition
 
@@ -124,7 +128,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
-STATICFILES_DIRS = [STATIC_DIR, ]
+STATICFILES_DIRS = [STATIC_DIR,]
 STATIC_URL = '/static/'
 
 # Media files
