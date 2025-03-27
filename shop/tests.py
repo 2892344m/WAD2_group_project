@@ -1,9 +1,9 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
 from django.urls import reverse
-from django.test import RequestFactory
+from django.core.files.uploadedfile import SimpleUploadedFile
 
-from shop.forms import ProductForm, SearchForm
+from shop.forms import BalanceForm, BecomeASellerForm, ChangeBalanceForm, ChangeProfileImgForm, ChangeUserFullnameForm, ChangeUsernameForm, ProductForm, ReviewForm, SearchForm
 from shop.models import Basket, Category, Order, Product, Review, UserAccount, Wishlist
 
 # Model Tests
@@ -279,7 +279,6 @@ class TestSearch(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(set(response.context['products']),{self.test_product,self.test_product2})
 
-#Having issues getting the form for this working, will have another look later
 class TestAddProduct(TestCase):
 
     def setUp(self):
@@ -403,9 +402,159 @@ class TestPurchase(TestCase):
     def test_purchase_confirm_with_useraccount(self):
         self.test_account = add_user_account(user=self.test_user, balance=9_000_000)
         old_basket = set(Basket.objects.all())
-        response = self.client.get(reverse('shop:checkout_detail'))
-        print(response.context['userAccount'])
+        subtracted_balance = self.test_account.balance - self.basket.total_price
+        response = self.client.get(reverse('shop:purchase_confirm'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "shop/purchase_confirm.html")
         self.assertNotEqual(set(Basket.objects.all()), old_basket)
+        self.assertEqual(response.context['userAccount'], self.test_account)
+        self.assertEqual(subtracted_balance, self.test_account.balance)
+
+# class TestAddRating(TestCase):
+#     def setUp(self):
+#         self.test_user = add_user()
+#         self.test_account = add_user_account(user=self.test_user, balance=90_000)
+#         self.client.force_login(self.test_user)
+#         self.test_category = add_category()
+
+#     def test_add_rating_get(self):
+#         test_product = add_product(seller=self.test_user, category=self.test_category, product_name="potash")
+#         response = self.client.get(reverse('shop:add_rating'), kwargs={'product_slug':'potash'})
+
+#         self.assertEqual(response.status_code, 200)
+#         self.assertEqual(response.context['product'], self.test_product)
+#         self.assertEqual(type(response.context['form']), type(ReviewForm()))
+
+class TestAccountView(TestCase):
+    def setUp(self):
+        self.test_user = add_user()
+        self.test_account = add_user_account(user=self.test_user, balance=90_000)
+        self.client.force_login(self.test_user)
+
+    def test_view_account(self):
+        response = self.client.get(reverse('shop:view_account'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['user'], self.test_user)
+        self.assertEqual(response.context['userAccount'], self.test_account)
+
+    def test_change_name_get(self):
+        response = self.client.get(reverse('shop:change_name'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(type(response.context['form']), type(ChangeUserFullnameForm()))
+        self.assertEqual(response.context['change'], 'Change Full Name')
+
+    def test_change_name_post(self):
+        form_data = {
+            'first_name': 'Steve',
+            'last_name': 'Stevenson'
+        }
+
+        form = ChangeUserFullnameForm(data=form_data)
+        self.assertTrue(form.is_valid())
+
+        response = self.client.post(reverse('shop:change_name'), form_data)
+        user = User.objects.get(id=self.test_user.id)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(user.first_name, 'Steve')
+        self.assertEqual(user.last_name, 'Stevenson')
+
+    def test_change_username_get(self):
+        response = self.client.get(reverse('shop:change_username'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(type(response.context['form']), type(ChangeUsernameForm()))
+        self.assertEqual(response.context['change'], 'Change Username')
+
+    def test_change_username_post(self):
+        form_data = {
+            'username': 'newUsername'
+        }
+        form = ChangeUsernameForm(data=form_data)
+        self.assertTrue(form.is_valid())
+
+        response = self.client.post(reverse('shop:change_username'), form_data)
+        user = User.objects.get(id=self.test_user.id)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(user.username, "newUsername")
+
+    def test_become_a_seller_get(self):
+        response = self.client.get(reverse('shop:become_seller'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(type(response.context['form']), type(BecomeASellerForm()))
+        self.assertEqual(response.context['change'], 'Become a Seller')
+        self.assertEqual(response.context['message'], "Clicking this button will make you a seller, allowing you to sell products on our site. This is a quick warning that we take 92 percent of profits from transactions. To proceed please click the submit button.")
+
+    def test_become_a_seller_post(self):
+        form_data = {
+            'seller': True
+        }
+        form = BecomeASellerForm(data=form_data)
+        self.assertTrue(form.is_valid())
+
+        response = self.client.post(reverse('shop:become_seller'), form_data)
+        user_account = UserAccount.objects.get(user=self.test_user)
+        
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(user_account.seller_account, True)
+
+    def test_change_profile_img_get(self):
+        response = self.client.get(reverse('shop:change_profile_img'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(type(response.context['form']), type(ChangeProfileImgForm()))
+        self.assertEqual(response.context['change'], 'Change Profile Picture')
+
+    def test_change_balance_get(self):
+        response = self.client.get(reverse('shop:change_balance'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(type(response.context['form']), type(ChangeBalanceForm()))
+        self.assertEqual(response.context['change'], 'Change Balance')
+        self.assertEqual(response.context['message'], "Don't worry, we ALWAYS have your payment info :)")
+
+    def test_change_balance_post(self):
+        form_data = {
+            'balance' : 3000
+        }
+        form = ChangeBalanceForm(data=form_data)
+        self.assertTrue(form.is_valid())
+
+        response = self.client.post(reverse('shop:change_balance'), form_data)
+        user_account = UserAccount.objects.get(user=self.test_user)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(user_account.balance, 93_000)
+
+class TestOrders(TestCase):
+    def setUp(self):
+        self.test_user = add_user()
+        self.test_account = add_user_account(user=self.test_user)
+        self.client.force_login(self.test_user)
+        self.test_category = add_category()
+    
+    def test_empty_orders(self):
+        response = self.client.get(reverse('shop:view_orders'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotEqual(response.context['orders'], set())
+
+    def test_contains_orders(self):
+        test_product1 = add_product(seller=self.test_user,category=self.test_category,product_name="test")
+        test_product2 = add_product(seller=self.test_user,category=self.test_category,product_name="test2")
+        test_product3 = add_product(seller=self.test_user,category=self.test_category,product_name="test3")
+
+        order = add_order(order_owner=self.test_user, products=[test_product1,test_product2,test_product3])
+        self.test_account.orders.add(order)
+
+        response = self.client.get(reverse('shop:view_orders'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(set(response.context['orders'].all()), {order})
 
 # Helper Methods
 def add_user(username="testUsername", email="test@test.com", password="testPassword"):
