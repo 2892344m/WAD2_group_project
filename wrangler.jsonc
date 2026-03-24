@@ -1,0 +1,63 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "hono-production-app",
+	"main": "src/main.ts",
+	"compatibility_date": "2025-11-12",
+	"assets": {
+		"binding": "STATIC",
+		"directory": "assets"
+	},
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "database",
+			"database_id": "3b0d5ba6-f9b8-4f69-be04-2debf48ee949",
+			"migrations_dir": "./drizzle"
+		}
+	],
+	"r2_buckets": [
+		{
+			"binding": "IMAGES_BUCKET",
+			"bucket_name": "shw-equipment-images"
+		},
+		{
+			"bucket_name": "shw-equipment-images",
+			"binding": "shw_equipment_images"
+		}
+	],
+	"observability": {
+		"enabled": true
+	},
+	// "compatibility_flags": [
+	//   "nodejs_compat"
+	// ],
+	// "vars": {
+	//   "MY_VAR": "my-variable"
+	// },
+	// "kv_namespaces": [
+	//   {
+	//     "binding": "MY_KV_NAMESPACE",
+	//     "id": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+	//   }
+	// ],
+	// "r2_buckets": [
+	//   {
+	//     "binding": "MY_BUCKET",
+	//     "bucket_name": "my-bucket"
+	//   }
+	// ],
+	// "d1_databases": [
+	//   {
+	//     "binding": "MY_DB",
+	//     "database_name": "my-database",
+	//     "database_id": ""
+	//   }
+	// ],
+	// "ai": {
+	//   "binding": "AI"
+	// },
+	// "observability": {
+	//   "enabled": true,
+	//   "head_sampling_rate": 1
+	// }
+}
